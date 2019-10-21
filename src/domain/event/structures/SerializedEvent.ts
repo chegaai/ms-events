@@ -1,19 +1,26 @@
 import { ObjectId } from 'bson'
-import { SocialNetworkObject } from '../Event'
 import { Nullable } from '../../../utils/Nullable'
+import { EventType, Inquiry, Attendee, Picture, AgendaSlot, Place, RSVP } from './Types'
 
 export interface SerializedEvent {
   _id: ObjectId
   name: string
-  founder: ObjectId
+  description: string
+  seats: number
+  type: EventType
+  startAt: Date
+  endAt: Date
+  owner: ObjectId
   organizers: ObjectId[]
-  pictures: {
-    profile: string
-    banner: string
-  }
-  socialNetworks: SocialNetworkObject[]
+  needsDocument: boolean
+  inquiries: Inquiry[]
+  place: Place
+  rsvp: RSVP
+  attendees: Attendee[]
   tags: string[]
-  events: ObjectId[]
+  pictures: Picture[]
+  groups: ObjectId[]
+  agenda: AgendaSlot[]
   createdAt: Date
   updatedAt: Date
   deletedAt: Nullable<Date>

@@ -6,20 +6,20 @@ import { ServiceError } from '../errors/ServiceError'
 import { UnresponsiveServiceError } from '../errors/UnresponsiveServiceError'
 
 @injectable()
-export class UserClient {
+export class GroupClient {
 
   private readonly client: AxiosInstance
 
-  constructor (@inject('UserServiceConnection') connectionData: IAppConfig['microServices']['user']) {
+  constructor (@inject('GroupServiceConnection') connectionData: IAppConfig['microServices']['group']) {
     this.client = axios.create({ baseURL: connectionData.url })
   }
 
-  async findUserById (id: ObjectId | string) {
+  async findGroupById (id: ObjectId | string) {
     try {
       const { data } = await this.client.get(`/${new ObjectId(id).toHexString()}`)
       return data
     } catch (error) {
-      if (!error.response) throw new UnresponsiveServiceError('users')
+      if (!error.response) throw new UnresponsiveServiceError('groups')
       if (error.response.status === 404) return null
       throw new ServiceError(error.response)
     }

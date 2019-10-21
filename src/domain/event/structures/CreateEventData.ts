@@ -1,32 +1,20 @@
-import { EvenType, Inquiry, Picture } from '../Event'
-import { ObjectId } from 'bson'
+import { Inquiry, Place, RSVP, Picture, AgendaSlot, EventType } from './Types'
 
 export interface CreateEventData {
-  eventname: string
   name: string
   description: string
   seats: number
-  type: EvenType
+  type: EventType
   startAt: Date
   endAt: Date
-  owner: ObjectId
-  organizers: ObjectId[]
+  owner: string
+  organizers: string[]
   needsDocument: boolean
   inquiries: Inquiry[]
-  place: {
-    address: string,
-    zipCode: string,
-    number: string,
-    complement: string,
-    country: string,
-    city: string,
-    state: string
-  },
-  rsvp: {
-    openAt: Date,
-    closeAt: Date
-  },
+  place: Place
+  rsvp: RSVP
   tags: string[]
-  pictures: Picture[]
-  groups: ObjectId[]
+  pictures: Omit<Picture, 'isDeleted'>[]
+  groups: string[]
+  agenda: AgendaSlot[]
 }

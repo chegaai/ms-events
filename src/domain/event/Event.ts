@@ -1,59 +1,16 @@
 import { ObjectId } from 'bson'
-Number = 'number',
-  Selection = 'selection'
-}
-
-export interface Inquiry {
-  type: InquiryType,
-  title: string,
-  options: string[], // only if seletion = true
-  subtitle: string,
-  required: boolean
-}
-
-export interface AttendeeResponse {
-  questionTitle: string,
-  response: string
-}
-
-export interface Attendee {
-  userId: ObjectId,
-  attendeeResponses: AttendeeResponse[]
-}
-
-export interface Picture {
-  isDeleted: boolean,
-  link: string,
-  index: number
-}
-
-export interface AgendaSlot {
-  title: string,
-  hour: Date,
-  index: number
-}
-
-export interface Place {
-  address: string,
-  zipCode: string,
-  number: string,
-  complement: string,
-  country: string,
-  city: string,
-  state: string
-}
-
-export interface RSVP {
-  openAt: Date,
-  closeAt: Date
-}
+import { BaseEntity, BaseEntityData } from '../BaseEntity'
+import stringToObjectId from 'string-to-objectid'
+import { UpdateEventData } from './structures/UpdateEventData'
+import { CreateEventData } from './structures/CreateEventData'
+import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType } from './structures/Types'
 
 export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
   name: string = ''
   description: string = ''
   seats: number = 0
-  type: EvenType = EvenType.Presential
+  type: EventType = EventType.Presential
   startAt: Date = new Date()
   endAt: Date = new Date()
   owner: ObjectId = new ObjectId()
@@ -88,46 +45,28 @@ export class Event extends BaseEntity {
     event.type = data.type
     event.startAt = data.startAt
     event.endAt = data.endAt
-    event.owner = data.owner
-    event.organizers = data.organizers.map((organizer: string | ObjectId) => new ObjectId(organizer))
+    event.owner = stringToObjectId(data.owner)
+    event.organizers = data.organizers.map(stringToObjectId)
 
     event.needsDocument = data.needsDocument
-    event.inquiries = data.inquiries.map((inquiry: Inquiry) => {
-      const data = {
-        type: inquiry.type,
-        title: inquiry.title,
-        options: inquiry.options,
-        subtitle: inquiry.subtitle,
-        required: inquiry.required
-      }
+    event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
+      ...inquiry,
+      options: inquiry.type !== InquiryType.Selection ? [] : inquiry.options,
+    }))
 
-      if (inquiry.type !== InquiryType.Selection) {
-        data.options = []
-      }
-      return data
-    })
-    event.place = {
-      address: data.place.address,
-      zipCode: data.place.zipCode,
-      number: data.place.number,
-      complement: data.place.complement,
-      country: data.place.country,
-      city: data.place.city,
-      state: data.place.state
-    }
-    event.rsvp = {
-      openAt: data.rsvp.openAt,
-      closeAt: data.rsvp.openAt
-    }
+    event.place = data.place
+
+    event.rsvp = data.rsvp
+
     event.tags = data.tags
-    event.pictures = data.pictures.map((picture: Picture) => {
+    event.pictures = data.pictures.map((picture: Omit<Picture, 'isDeleted'>) => {
       return {
-        isDeleted: false,
-        link: picture.link,
-        index: picture.index
+        ...picture,
+        isDeleted: false
       }
     })
-    event.groups = data.groups.map((group: string | ObjectId) => new ObjectId(group))
+
+    event.groups = data.groups.map(stringToObjectId)
 
     if (data.createdAt) event.createdAt = data.createdAt
     if (data.deletedAt) event.deletedAt = data.deletedAt
@@ -136,71 +75,27 @@ export class Event extends BaseEntity {
     return event
   }
 
-  update (dataToUpdate: UpdateEventData): Event {
-    this.name = dataToUpdate.name
-    this.description = dataToUpdate.description
-    this.seats = dataToUpdate.seats
-    this.type = dataToUpdate.type
-    this.startAt = dataToUpdate.startAt
-    this.endAt = dataToUpdate.endAt
-    this.owner = dataToUpdate.owner
-    this.organizers = dataToUpdate.organizers.map((organizer: string | ObjectId) => new ObjectId(organizer))
-    this.needsDocument = dataToUpdate.needsDocument
-    this.inquiries = dataToUpdate.inquiries.map((inquiry: Inquiry) => {
-      const data = {
-        type: inquiry.type,
-        title: inquiry.title,
-        options: inquiry.options,
-        subtitle: inquiry.subtitle,
-        required: inquiry.required
-      }
-
-      if (inquiry.type !== InquiryType.Selection) {
-        data.options = []
-      }
-      return data
-    })
-    this.place = {
-      address: dataToUpdate.place.address,
-      zipCode: dataToUpdate.place.zipCode,
-      number: dataToUpdate.place.number,
-      complement: dataToUpdate.place.complement,
-      country: dataToUpdate.place.country,
-      city: dataToUpdate.place.city,
-      state: dataToUpdate.place.state
-    }
-    this.rsvp = {
-      openAt: dataToUpdate.rsvp.openAt,
-      closeAt: dataToUpdate.rsvp.openAt
-    }
-    this.tags = dataToUpdate.tags
-    this.pictures = dataToUpdate.pictures.map((picture: Picture) => {
-      return {
-        isDeleted: false,
-        link: picture.link,
-        index: picture.index
-      }
-    })
-    this.groups = dataToUpdate.groups.map((group: string | ObjectId) => new ObjectId(group))
-    this.agenda = dataToUpdate.agenda.map((agenda: AgendaSlot) => {
-      return {
-        title: agenda.title,
-        hour: agenda.hour,
-        index: agenda.index
-
-      }
-    })
-    this.attendees = dataToUpdate.attendees.map((attendee: Attendee) => {
-      return {
-        userId: attendee,
-        attendeeResponses: attendee.attendeeResponses.map((response: AttendeeResponse) => {
-          return {
-            questionTitle: response.questionTitle,
-            response: response.response
-          }
-        })
-      }
-    })
+  update (dataToUpdate: Partial<UpdateEventData>): Event {
+    this.name = dataToUpdate.name || this.name
+    this.description = dataToUpdate.description || this.description
+    this.seats = dataToUpdate.seats || this.seats
+    this.type = dataToUpdate.type || this.type
+    this.startAt = dataToUpdate.startAt || this.startAt
+    this.endAt = dataToUpdate.endAt || this.endAt
+    this.owner = dataToUpdate.owner ? stringToObjectId(dataToUpdate.owner) : this.owner
+    this.organizers = dataToUpdate.organizers ? dataToUpdate.organizers.map(stringToObjectId) : this.organizers
+    this.needsDocument = dataToUpdate.needsDocument || this.needsDocument
+    this.inquiries = dataToUpdate.inquiries ? dataToUpdate.inquiries.map((inquiry: Inquiry) => ({
+      ...inquiry,
+      options: inquiry.type !== InquiryType.Selection ? [] : inquiry.options,
+    })) : this.inquiries
+    this.place = dataToUpdate.place || this.place
+    this.rsvp = dataToUpdate.rsvp || this.rsvp
+    this.tags = dataToUpdate.tags || this.tags
+    this.pictures = dataToUpdate.pictures || this.pictures
+    this.groups = dataToUpdate.groups ? dataToUpdate.groups.map(stringToObjectId) : this.groups
+    this.agenda = dataToUpdate.agenda || this.agenda
+    this.attendees = dataToUpdate.attendees || this.attendees
     this.updatedAt = new Date()
     return this
   }

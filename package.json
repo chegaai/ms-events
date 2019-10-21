@@ -25,13 +25,17 @@
     "@expresso/errors": "^1.2.0",
     "@expresso/server": "^1.1.3",
     "@expresso/validator": "^1.0.4",
-    "@nindoo/mongodb-data-layer": "^1.2.0",
+    "@nindoo/mongodb-data-layer": "^2.0.5",
+    "axios": "^0.19.0",
+    "bson": "^4.0.2",
     "express-rescue": "^1.1.22",
     "reflect-metadata": "^0.1.13",
+    "string-to-objectid": "^1.0.4",
     "sugar-env": "^1.5.7",
     "tsyringe": "^3.3.0"
   },
   "devDependencies": {
+    "@types/bson": "^4.0.0",
     "@types/express": "^4.17.0",
     "@types/node": "^12.6.5",
     "concurrently": "^4.1.1",
@@ -40,6 +44,6 @@
     "tslint": "^5.18.0",
     "tslint-config-standard": "^8.0.1",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.4"
   }
 }

@@ -1,6 +1,6 @@
 import { DomainError } from '../../domain.error'
 
-export class UserNotFoundError extends DomainError {
+export class OwnerNotFoundError extends DomainError {
   constructor (id: string) {
     super(`User ${id} does not exist`)
   }

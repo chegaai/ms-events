@@ -3,12 +3,20 @@ import { IExpressoConfigOptions } from '@expresso/app'
 import { IMongoParams } from '@nindoo/mongodb-data-layer'
 import { IServerConfig } from '@expresso/server'
 
+interface MicroserviceConfig {
+  url: string
+}
+
 export interface IAppConfig extends IExpressoConfigOptions {
   name: string,
   database: {
     mongodb: IMongoParams
   },
   server?: IServerConfig['server']
+  microServices: {
+    user: MicroserviceConfig
+    group: MicroserviceConfig
+  }
 }
 
 export const config: IAppConfig = {
@@ -25,6 +33,14 @@ export const config: IAppConfig = {
         useNewUrlParser: true,
         useUnifiedTopology: true
       }
+    }
+  },
+  microServices: {
+    user: {
+      url: env.get('MICROSERVICES_USER_URL', '')
+    },
+    group: {
+      url: env.get('MICROSERVICES_GROUP_URL', '')
     }
   }
 }

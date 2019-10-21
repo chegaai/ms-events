@@ -20,11 +20,7 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     return Event.create(_id, eventData)
   }
 
-  async existsByDocument (document: string): Promise<boolean> {
-    return this.existsBy({ document: document, deletedAt: null })
-  }
-
-  async getAll (): Promise<PaginatedQueryResult<Event>> {
-    return this.runPaginatedQuery({ deletedAt: null })
+  async getAll (page: number, size: number): Promise<PaginatedQueryResult<Event>> {
+    return this.runPaginatedQuery({ deletedAt: null }, page, size)
   }
 }
