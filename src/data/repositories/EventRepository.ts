@@ -1,9 +1,8 @@
-import { Db } from 'mongodb'
-import { ObjectId } from 'bson'
+import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 import { inject, injectable } from 'tsyringe'
+import { Db } from 'mongodb'
 import { Event } from '../../domain/event/Event'
 import { SerializedEvent } from '../../domain/event/structures/SerializedEvent'
-import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 
 @injectable()
 export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
@@ -12,24 +11,20 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     super(connection.collection(EventRepository.collection))
   }
 
-  serialize (entity: Event) {
+  serialize (entity: Event): SerializedEvent {
     return entity.toObject()
   }
 
   deserialize (data: SerializedEvent): Event {
-    const { _id, ...groupData } = data
-    return Event.create(_id, groupData)
+    const { _id, ...eventData } = data
+    return Event.create(_id, eventData)
   }
 
-  async existsByName (name: string): Promise<boolean> {
-    return this.existsBy({ name, deletedAt: null })
+  async existsByDocument (document: string): Promise<boolean> {
+    return this.existsBy({ document: document, deletedAt: null })
   }
 
-  async getAll (page: number, size: number): Promise<PaginatedQueryResult<Event>> {
-    return this.runPaginatedQuery({ deletedAt: null }, page, size)
-  }
-
-  async findManyById (communityIds: ObjectId[], page: number, size: number): Promise<PaginatedQueryResult<Event>> {
-    return this.runPaginatedQuery({ _id: { $in: communityIds }, deletedAt: null }, page, size)
+  async getAll (): Promise<PaginatedQueryResult<Event>> {
+    return this.runPaginatedQuery({ deletedAt: null })
   }
 }

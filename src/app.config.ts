@@ -8,30 +8,23 @@ export interface IAppConfig extends IExpressoConfigOptions {
   database: {
     mongodb: IMongoParams
   },
-  server?: IServerConfig['server'],
-  microServices: {
-    user: {
-      url: string
-    }
-  }
+  server?: IServerConfig['server']
 }
 
 export const config: IAppConfig = {
-  name: 'ms-events',
+  name: 'ms-event',
   server: {
     printOnListening: true,
   },
   database: {
     mongodb: {
       uri: env.get('DATABASE_MONGODB_URI', ''),
-      dbName: env.get('DATABASE_MONGODB_DBNAME', 'group'),
+      dbName: env.get('DATABASE_MONGODB_DBNAME', 'chegaai'),
       maximumConnectionAttempts: 5,
-      options: {}
-    }
-  },
-  microServices: {
-    user: {
-      url: env.get('MICROSERVICE_USER_URL', '')
+      options: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }
     }
   }
 }

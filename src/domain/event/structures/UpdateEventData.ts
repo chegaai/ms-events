@@ -1,7 +1,7 @@
-import { EvenType, Inquiry, Picture } from '../Event'
+import { EvenType, Inquiry, Picture, Attendee, AgendaSlot } from '../Event'
 import { ObjectId } from 'bson'
 
-export interface CreateEventData {
+export interface UpdateEventData {
   eventname: string
   name: string
   description: string
@@ -10,17 +10,17 @@ export interface CreateEventData {
   startAt: Date
   endAt: Date
   owner: ObjectId
-  organizers: ObjectId[]
+  organizers:ObjectId[]
   needsDocument: boolean
   inquiries: Inquiry[]
   place: {
-    address: string,
-    zipCode: string,
-    number: string,
-    complement: string,
-    country: string,
-    city: string,
-    state: string
+      address: string,
+      zipCode: string,
+      number: string,
+      complement: string,
+      country: string,
+      city: string,
+      state: string
   },
   rsvp: {
     openAt: Date,
@@ -29,4 +29,6 @@ export interface CreateEventData {
   tags: string[]
   pictures: Picture[]
   groups: ObjectId[]
+  attendees: Attendee[]
+  agenda: AgendaSlot[]
 }
