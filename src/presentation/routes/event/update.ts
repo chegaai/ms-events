@@ -11,33 +11,96 @@ export function factory (service: EventService) {
       type: 'object',
       properties: {
         name: { type: 'string' },
-        pictures: {
-          type: 'object',
-          properties: {
-            profile: { type: 'string' },
-            banner: { type: 'string' }
+        description: { type: 'string' },
+        banner: { type: 'string' },
+        seats: { type: 'number', minimum: 1 },
+        type: { type: 'string', enum: ['presential', 'online'] },
+        startAt: { type: 'string', format: 'date-time' },
+        endAt: { type: 'string', format: 'date-time' },
+        owner: { type: 'string' },
+        organizers: {
+          type: 'array',
+          items: { type: 'string' }
+        },
+        needsDocument: { type: 'boolean' },
+        inquiries: {
+          type: 'array',
+          items: {
+            type: 'object',
+            anyOf: [
+              {
+                type: 'object',
+                properties: {
+                  type: {
+                    type: 'string',
+                    enum: ['number', 'text']
+                  },
+                  title: { type: 'string' },
+                  subtitle: { type: 'string' },
+                  required: { type: 'boolean' }
+                },
+                additionalProperties: false,
+                required: ['title', 'type', 'required']
+              },
+              {
+                type: 'object',
+                properties: {
+                  type: {
+                    type: 'string',
+                    enum: ['selection']
+                  },
+                  title: { type: 'string' },
+                  subtitle: { type: 'string' },
+                  options: { type: 'array', items: { type: 'string' } },
+                  required: { type: 'boolean' }
+                },
+                additionalProperties: false,
+                required: ['title', 'type', 'required', 'options']
+              }
+            ]
           }
         },
-        socialNetworks: {
+        place: {
+          type: 'object',
+          properties: {
+            address: { type: 'string' },
+            zipCode: { type: 'string' },
+            number: { type: 'string' },
+            complement: { type: 'string' },
+            country: { type: 'string' },
+            city: { type: 'string' },
+            state: { type: 'string' },
+          },
+          additionalProperties: false,
+          required: ['address', 'zipCode', 'number', 'country', 'city', 'state']
+        },
+        tags: {
+          type: 'array',
+          items: { type: 'string' }
+        },
+        groups: {
+          type: 'array',
+          items: { type: 'string' }
+        },
+        rsvp: {
+          type: 'object',
+          properties: {
+            openAt: { type: 'string', format: 'date-time' },
+            closeAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        agenda: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              name: { type: 'string' },
-              link: { type: 'string' }
-            }
-          }
-        },
-        tags: {
-          type: 'array',
-          items: {
-            type: 'string'
-          }
-        },
-        organizers: {
-          type: 'array',
-          items: {
-            type: 'string'
+              title: { type: 'string' },
+              speaker: { type: 'string' },
+              at: { type: 'string', format: 'date-time' },
+              index: { type: 'number' }
+            },
+            additionalProperties: false,
+            required: ['title', 'speaker', 'at', 'index']
           }
         }
       },
