@@ -26,8 +26,7 @@ export interface AttendeeResponse {
 export interface Attendee {
   name: string
   email: string
-  gender: string
-  attendeeResponses: AttendeeResponse[]
+  inquiryResponses: AttendeeResponse[]
 }
 
 export interface Picture {
