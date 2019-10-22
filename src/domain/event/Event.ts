@@ -49,26 +49,15 @@ export class Event extends BaseEntity {
     event.endAt = data.endAt
     event.owner = stringToObjectId(data.owner)
     event.organizers = data.organizers.map(stringToObjectId)
-
     event.needsDocument = data.needsDocument
     event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
       ...inquiry,
       options: inquiry.type !== InquiryType.Selection ? [] : inquiry.options,
     }))
-
     event.place = data.place
-
-    event.rsvp = data.rsvp
-
     event.tags = data.tags
-    event.pictures = data.pictures.map((picture: Omit<Picture, 'isDeleted'>) => {
-      return {
-        ...picture,
-        isDeleted: false
-      }
-    })
-
     event.groups = data.groups.map(stringToObjectId)
+    event.agenda = data.agenda
 
     if (data.createdAt) event.createdAt = data.createdAt
     if (data.deletedAt) event.deletedAt = data.deletedAt
