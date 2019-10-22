@@ -5,6 +5,7 @@ import { EventType, Inquiry, Attendee, Picture, AgendaSlot, Place, RSVP } from '
 export interface SerializedEvent {
   _id: ObjectId
   name: string
+  banner: string
   description: string
   seats: number
   type: EventType
