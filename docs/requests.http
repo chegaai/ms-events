@@ -1,0 +1,31 @@
+@host = localhost
+@port = 3000
+
+### Create event
+
+# @name createEvent
+POST http://{{host}}:{{port}}/
+Content-Type: application/json
+
+{
+
+}
+
+### List events
+
+GET http://{{host}}:{{port}}/
+
+### Delete event
+
+# @name deleteEvent
+DELETE http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
+
+### Update event
+
+# @name updateEvent
+PUT http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
+
+### Get event
+
+# @name getEvent
+GET http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
