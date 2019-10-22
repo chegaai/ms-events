@@ -92,6 +92,18 @@ export class Event extends BaseEntity {
     return this
   }
 
+  addAttendee (attendee: Attendee) {
+    if (this.attendees.filter(att => att.email === attendee.email).length > 0) return this
+    this.attendees.push(attendee)
+    return this
+  }
+
+  addPicture (picture: Picture) {
+    if (this.pictures.filter(pic => pic.link === picture.link).length > 0) return this
+    this.pictures.push(picture)
+    return this
+  }
+
   toObject () {
     return {
       _id: this.id,
