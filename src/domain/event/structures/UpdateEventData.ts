@@ -3,6 +3,7 @@ import { EventType, Inquiry, Picture, Attendee, AgendaSlot, Place, RSVP } from '
 export interface UpdateEventData {
   name: string
   description: string
+  banner: string
   seats: number
   type: EventType
   startAt: Date

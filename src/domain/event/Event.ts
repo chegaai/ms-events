@@ -9,6 +9,7 @@ export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
   name: string = ''
   description: string = ''
+  banner: string = ''
   seats: number = 0
   type: EventType = EventType.Presential
   startAt: Date = new Date()
@@ -41,6 +42,7 @@ export class Event extends BaseEntity {
     event.id = id
     event.name = data.name
     event.description = data.description
+    event.banner = data.banner
     event.seats = data.seats
     event.type = data.type
     event.startAt = data.startAt
@@ -79,6 +81,7 @@ export class Event extends BaseEntity {
     this.name = dataToUpdate.name || this.name
     this.description = dataToUpdate.description || this.description
     this.seats = dataToUpdate.seats || this.seats
+    this.banner = dataToUpdate.banner || this.banner
     this.type = dataToUpdate.type || this.type
     this.startAt = dataToUpdate.startAt || this.startAt
     this.endAt = dataToUpdate.endAt || this.endAt
@@ -105,6 +108,7 @@ export class Event extends BaseEntity {
       _id: this.id,
       name: this.name,
       description: this.description,
+      banner: this.banner,
       seats: this.seats,
       type: this.type,
       startAt: this.startAt,

@@ -1,8 +1,9 @@
-import { Inquiry, Place, RSVP, Picture, AgendaSlot, EventType } from './Types'
+import { Inquiry, Place, RSVP, AgendaSlot, EventType } from './Types'
 
 export interface CreateEventData {
   name: string
   description: string
+  banner: string
   seats: number
   type: EventType
   startAt: Date
@@ -14,7 +15,6 @@ export interface CreateEventData {
   place: Place
   rsvp: RSVP
   tags: string[]
-  pictures: Omit<Picture, 'isDeleted'>[]
   groups: string[]
   agenda: AgendaSlot[]
 }
