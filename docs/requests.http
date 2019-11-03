@@ -4,11 +4,42 @@
 ### Create event
 
 # @name createEvent
+
 POST http://{{host}}:{{port}}/
 Content-Type: application/json
+X-On-Behalf-Of: 5dbe56b46de0af00112acb24
 
 {
-
+  "name": "Evento 1",
+  "description": "Desc 1",
+  "banner": "base64",
+  "seats": "90",
+  "type": "online",
+  "startAt": "2019-12-03T11:12:23Z",
+  "endAt": "2019-12-04T18:12:32Z",
+  "organizers": [],
+  "needsDocument": true,
+  "inquiries": [
+    { "type": "text", "title": "Inquiry Title", "subtitle": "Inquiry sub", "required": false }
+  ],
+  "place": {
+    "address": "Addr",
+    "zipCode": "Zip",
+    "number": "Nr",
+    "complement": "",
+    "country": "Brazil",
+    "city": "São Paulo",
+    "state": "SP"
+  },
+  "tags": ["kubernetes"],
+  "groups": ["5dbe3480ca33ddc2f7566691"],
+  "rsvp": {
+    "openAt": "2019-11-20T00:00:00Z",
+    "closeAt": "2019-12-01T00:00:00Z"
+  },
+  "agenda": [
+    { "title": "Session", "speaker": "Lucas Santos", "index": 0, "at": "2019-12-03T13:00:00Z" }
+  ]
 }
 
 ### List events
@@ -18,14 +49,14 @@ GET http://{{host}}:{{port}}/
 ### Delete event
 
 # @name deleteEvent
-DELETE http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
+DELETE http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b
 
 ### Update event
 
 # @name updateEvent
-PUT http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
+PUT http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b
 
 ### Get event
 
 # @name getEvent
-GET http://{{host}}:{{port}}/{{createEvent.response.body.$.id}}
+GET http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b
