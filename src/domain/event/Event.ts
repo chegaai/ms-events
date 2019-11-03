@@ -3,7 +3,7 @@ import { BaseEntity, BaseEntityData } from '../BaseEntity'
 import stringToObjectId from 'string-to-objectid'
 import { UpdateEventData } from './structures/UpdateEventData'
 import { CreateEventData } from './structures/CreateEventData'
-import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType } from './structures/Types'
+import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType, RSVPStates } from './structures/Types'
 
 export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
@@ -32,6 +32,7 @@ export class Event extends BaseEntity {
     closeAt: new Date()
   }
   attendees: Attendee[] = []
+  waitingList: Attendee[] = []
   agenda: AgendaSlot[] = []
   tags: string[] = []
   pictures: Picture[] = []
@@ -58,6 +59,9 @@ export class Event extends BaseEntity {
     event.tags = data.tags
     event.groups = data.groups.map(stringToObjectId)
     event.agenda = data.agenda
+
+    if (data.attendees) event.attendees = data.attendees
+    if (data.waitingList) event.waitingList = data.waitingList
 
     if (data.createdAt) event.createdAt = data.createdAt
     if (data.deletedAt) event.deletedAt = data.deletedAt
@@ -93,9 +97,63 @@ export class Event extends BaseEntity {
   }
 
   addAttendee (attendee: Attendee) {
-    if (this.attendees.filter(att => att.email === attendee.email).length > 0) return this
+    // Attendee is on waiting list and declines event (only possible flux)
+    if (this.attendeeIsOnWaitingList(attendee) && attendee.rsvp === RSVPStates.NotGoing) {
+      this.waitingList = this.removeFromList(this.waitingList, attendee)
+      this.attendees.push(attendee)
+      return this
+    }
+
+    // Attendee is on attending list
+    if (this.attendeeIsOnList(attendee)) {
+      // Takes the current state
+      const currentState = this.attendees.find(att => att.email === attendee.email)!
+      // Remove attendee from list
+      this.attendees = this.removeFromList(this.attendees, attendee)
+      // Attendee changes the state from Declined to Attending
+      if (currentState.rsvp === RSVPStates.NotGoing && attendee.rsvp === RSVPStates.Going) return this.checkAndAddToList(attendee)
+
+      // Otherwise go to attendind list
+      this.attendees.push(attendee)
+      return this
+    }
+
+    // Attendee is not on list and is going
+    if (attendee.rsvp === RSVPStates.Going) return this.checkAndAddToList(attendee)
+
+    // Otherwise add to list
     this.attendees.push(attendee)
     return this
+  }
+
+  private addToWaitingList (attendee: Attendee) {
+    attendee.rsvp = RSVPStates.WaitingList
+    return this.waitingList.push(attendee)
+  }
+
+  private checkAndAddToList (attendee: Attendee) {
+    if (!this.hasSeats()) { // If no more seats go to waiting list
+      this.addToWaitingList(attendee)
+      return this
+    }
+    this.attendees.push(attendee)
+    return this
+  }
+
+  private removeFromList (list: Attendee[], attendee: Attendee) {
+    return list.filter(att => attendee.email !== att.email)
+  }
+
+  private hasSeats () {
+    return this.seats > this.attendees.filter(att => att.rsvp === RSVPStates.Going).length
+  }
+
+  private attendeeIsOnWaitingList (attendee: Attendee) {
+    return this.waitingList.find(att => att.email === attendee.email)
+  }
+
+  private attendeeIsOnList (attendee: Attendee) {
+    return this.attendees.find(att => att.email === attendee.email)
   }
 
   addPicture (picture: Picture) {
@@ -132,6 +190,7 @@ export class Event extends BaseEntity {
         closeAt: this.rsvp.closeAt
       },
       attendees: this.attendees,
+      waitingList: this.waitingList,
       tags: this.tags,
       pictures: this.pictures,
       groups: this.groups,

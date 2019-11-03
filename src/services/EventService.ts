@@ -13,6 +13,7 @@ import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { GroupClient } from '../data/repositories/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
+import { Attendee } from '../domain/event/structures/Types'
 
 @injectable()
 export class EventService {
@@ -71,6 +72,19 @@ export class EventService {
     event.delete()
 
     await this.repository.save(event)
+  }
+
+  async addRSVP (eventId: string, userId: string, rsvpData: Pick<Attendee, 'inquiryResponses' | 'rsvp'>) {
+    const event = await this.find(eventId)
+    const user = await this.userClient.findUserById(userId)
+    event.addAttendee({
+      name: user.name,
+      email: user.email,
+      timestamp: new Date(),
+      ...rsvpData
+    })
+    await this.repository.save(event)
+    return event
   }
 
   async find (id: string): Promise<Event> {

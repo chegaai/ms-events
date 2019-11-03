@@ -1,4 +1,4 @@
-import { Inquiry, Place, RSVP, AgendaSlot, EventType } from './Types'
+import { Inquiry, Place, RSVP, AgendaSlot, EventType, Attendee } from './Types'
 
 export interface CreateEventData {
   name: string
@@ -17,4 +17,6 @@ export interface CreateEventData {
   tags: string[]
   groups: string[]
   agenda: AgendaSlot[]
+  attendees?: Attendee[]
+  waitingList?: Attendee[]
 }

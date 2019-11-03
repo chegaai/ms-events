@@ -5,6 +5,17 @@ export enum InquiryType {
   Text = 'text'
 }
 
+export enum RSVPResponses {
+  Going = 'yes',
+  NotGoing = 'no'
+}
+
+export enum RSVPStates {
+  Going = 'yes',
+  NotGoing = 'no',
+  WaitingList = 'waiting'
+}
+
 export enum EventType {
   Presential = 'presential',
   Online = 'online'
@@ -27,6 +38,8 @@ export interface Attendee {
   name: string
   email: string
   inquiryResponses: AttendeeResponse[]
+  rsvp: RSVPStates
+  timestamp: Date
 }
 
 export interface Picture {
