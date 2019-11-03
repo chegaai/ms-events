@@ -13,16 +13,16 @@ export function factory (service: EventService) {
       }
     }),
     rescue(async (req: Request, res: Response) => {
-      const groups = await service.listAll(req.query.page, req.query.size)
+      const events = await service.listAll(req.query.page, req.query.size)
 
       res.status(200)
         .set({
-          'x-range-from': groups.range.from,
-          'x-range-to': groups.range.to,
-          'x-range-total': groups.total,
-          'x-range-size': groups.count
+          'x-range-from': events.range.from,
+          'x-range-to': events.range.to,
+          'x-range-total': events.total,
+          'x-range-size': events.count
         })
-        .json(groups.results)
+        .json(events.results)
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
       next(err)

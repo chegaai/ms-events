@@ -107,12 +107,12 @@ export function factory (service: EventService) {
       additionalProperties: false
     }),
     rescue(async (req: Request, res: Response) => {
-      const groupData = req.body
-      const groupId = req.params.groupId
-      const group = await service.update(groupId, groupData)
+      const eventData = req.body
+      const { eventId } = req.params
+      const event = await service.update(eventId, eventData)
 
       res.status(200)
-        .json(group)
+        .json(event)
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
       if (err instanceof GroupNotFoundError) return next(boom.notFound(err.message, { code: 'group_not_found' }))
