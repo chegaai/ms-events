@@ -5,7 +5,9 @@ import { Request, Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { OrganizerNotFoundError } from '../../../domain/event/errors/OrganizerNotFoundError'
 import { OwnerNotFoundError } from '../../../domain/event/errors/OwnerNotFoundError'
+import { InvalidOwnerError } from '../../../domain/event/errors/InvalidOwnerError'
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
+import { ExpressoExtendedRequest } from '../structures/ExpressoExtendedRequest'
 
 export function factory (service: EventService) {
   return [
@@ -19,7 +21,6 @@ export function factory (service: EventService) {
         type: { type: 'string', enum: ['presential', 'online'] },
         startAt: { type: 'string', format: 'date-time' },
         endAt: { type: 'string', format: 'date-time' },
-        owner: { type: 'string' },
         organizers: {
           type: 'array',
           items: { type: 'string' }
@@ -106,18 +107,19 @@ export function factory (service: EventService) {
           }
         }
       },
-      required: ['name', 'description', 'seats', 'type', 'startAt', 'endAt', 'owner', 'needsDocument', 'place', 'groups', 'rsvp'],
+      required: ['name', 'description', 'seats', 'type', 'startAt', 'endAt', 'needsDocument', 'place', 'groups', 'rsvp'],
       additionalProperties: false
     }),
-    rescue(async (req: Request, res: Response) => {
+    rescue(async (req: ExpressoExtendedRequest, res: Response) => {
       const eventData = req.body
-      const event = await service.create(eventData)
+      const event = await service.create(req.onBehalfOf, eventData)
 
       res.status(201)
         .json(event)
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
-      if (err instanceof OrganizerNotFoundError) return next(boom.badData(err.message, { code: 'organizer_not_found' }))
+      if (err instanceof OrganizerNotFoundError) return next(boom.notFound(err.message, { code: 'organizer_not_found' }))
+      if (err instanceof InvalidOwnerError) return next(boom.forbidden(err.message, { code: 'invalid_owner' }))
       if (err instanceof OwnerNotFoundError) return next(boom.notFound(err.message, { code: 'owner_not_found' }))
       if (err instanceof GroupNotFoundError) return next(boom.notFound(err.message, { code: 'group_not_found' }))
       next(err)

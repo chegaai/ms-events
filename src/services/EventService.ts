@@ -12,6 +12,7 @@ import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFound
 import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { GroupClient } from '../data/repositories/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
+import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
 
 @injectable()
 export class EventService {
@@ -21,12 +22,17 @@ export class EventService {
     private readonly groupClient: GroupClient
   ) { }
 
-  async create (creationData: CreateEventData): Promise<Event> {
-    await this.findOwner(creationData.owner as string)
-    await Promise.all(creationData.groups.map(id => this.findGroup(id as string)))
+  async create (owner: string, creationData: CreateEventData): Promise<Event> {
+    await this.findOwner(owner as string)
+    const groups = await Promise.all(creationData.groups.map(id => this.findGroup(id as string)))
+
+    const foundersAndOrganizers: string[] = groups
+      .map((group) => [group.founder, ...group.organizers]).flat()
+    if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
+
     if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findOrganizer(id as string)))
 
-    const event = Event.create(new ObjectId(), creationData)
+    const event = Event.create(new ObjectId(), { ...creationData, owner })
 
     return this.repository.save(event)
   }
