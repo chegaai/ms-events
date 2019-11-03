@@ -14,7 +14,7 @@ export class GroupClient {
     this.client = axios.create({ baseURL: connectionData.url })
   }
 
-  async findGroupById (id: ObjectId | string) {
+  async findGroupById (id: ObjectId | string): Promise<any | null> {
     try {
       const { data } = await this.client.get(`/${new ObjectId(id).toHexString()}`)
       return data
