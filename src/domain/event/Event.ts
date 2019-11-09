@@ -62,7 +62,7 @@ export class Event extends BaseEntity {
     event.agenda = data.agenda
 
     if (data.attendees) event.attendees = data.attendees
-    if (data.waitingList) event.waitingList = data.waitingList
+    if (data.waitingList) event.waitingList = data.waitingList.sort((prev, next) => prev.timestamp.getTime() - next.timestamp.getTime())
 
     if (data.createdAt) event.createdAt = data.createdAt
     if (data.deletedAt) event.deletedAt = data.deletedAt
