@@ -60,3 +60,17 @@ PUT http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b
 
 # @name getEvent
 GET http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b
+
+### Add RSVP
+
+# @name addRSVP
+
+PATCH http://{{host}}:{{port}}/5dbe55d9591bc1d9fcc46e8b/rsvps
+Content-Type: application/json
+
+{
+  "rsvp": "yes",
+  "inquiryResponses": [
+    { "questionTitle": "A question", "response": "response" }
+  ]
+}

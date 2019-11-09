@@ -115,9 +115,9 @@ export class Event extends BaseEntity {
       this.attendees = this.removeFromList(this.attendees, attendee)
       // Attendee changes the state from Declined to Attending
       if (currentState.rsvp === RSVPStates.NotGoing && attendee.rsvp === RSVPStates.Going) return this.checkAndAddToList(attendee)
+      // Attendee changes the state from Attending to Declined
+      if (currentState.rsvp === RSVPStates.Going && attendee.rsvp === RSVPStates.NotGoing) return this.moveWaitingList(attendee)
 
-      // Otherwise go to attendind list
-      this.attendees.push(attendee)
       return this
     }
 
@@ -127,6 +127,16 @@ export class Event extends BaseEntity {
     // Otherwise add to list
     this.attendees.push(attendee)
     return this
+  }
+
+  /**
+   * Removes an attendee from the confirmed list and puts the next attendee from the waiting list onto that list
+   * @param declinedAttendee {Attendee} Attendee who was confirmed and then declined
+   */
+  private moveWaitingList (declinedAttendee: Attendee) {
+    this.removeFromList(this.attendees, declinedAttendee)
+    const nextAttendeeOnWaitingList = this.waitingList.shift()
+    if (nextAttendeeOnWaitingList) this.checkAndAddToList(nextAttendeeOnWaitingList)
   }
 
   private isRSVPOpen () {
