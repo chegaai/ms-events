@@ -4,6 +4,7 @@ import stringToObjectId from 'string-to-objectid'
 import { UpdateEventData } from './structures/UpdateEventData'
 import { CreateEventData } from './structures/CreateEventData'
 import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType, RSVPStates } from './structures/Types'
+import { RSVPOutOfDateError } from './errors/RSVPOutOfDateError'
 
 export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
@@ -97,6 +98,8 @@ export class Event extends BaseEntity {
   }
 
   addAttendee (attendee: Attendee) {
+    if (!this.isRSVPOpen()) throw new RSVPOutOfDateError(this.rsvp)
+
     // Attendee is on waiting list and declines event (only possible flux)
     if (this.attendeeIsOnWaitingList(attendee) && attendee.rsvp === RSVPStates.NotGoing) {
       this.waitingList = this.removeFromList(this.waitingList, attendee)
@@ -124,6 +127,11 @@ export class Event extends BaseEntity {
     // Otherwise add to list
     this.attendees.push(attendee)
     return this
+  }
+
+  private isRSVPOpen () {
+    const today = new Date().getTime()
+    return today >= this.rsvp.openAt.getTime() && today <= this.rsvp.closeAt.getTime()
   }
 
   private addToWaitingList (attendee: Attendee) {
