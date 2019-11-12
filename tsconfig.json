@@ -27,10 +27,5 @@
     "experimentalDecorators": true,
 
     "emitDecoratorMetadata": true
-  },
-  "references": [{
-    "path": "../ms-users"
-  }, {
-    "path": "../ms-groups"
-  }]
+  }
 }
