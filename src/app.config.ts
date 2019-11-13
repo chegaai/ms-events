@@ -16,6 +16,14 @@ export interface IAppConfig extends IExpressoConfigOptions {
   microServices: {
     user: MicroserviceConfig
     group: MicroserviceConfig
+  },
+  azure:{
+    storage: {
+      accountName: string,
+      accountAccessKey: string,
+      containerName: string,
+      timeOut: number
+    }
   }
 }
 
@@ -41,6 +49,14 @@ export const config: IAppConfig = {
     },
     group: {
       url: env.get('MICROSERVICES_GROUP_URL', '')
+    }
+  },
+  azure:{
+    storage: {
+      accountName: env.get('AZURE_STORAGE_ACCOUNT_NAME', 'chegaai'),
+      accountAccessKey: env.get('AZURE_STORAGE_ACCOUNT_ACCESS_KEY', ''),
+      containerName: env.get('AZURE_STORAGE_CONTAINER_NAME', 'events'),
+      timeOut: env.get('AZURE_STORAGE_TIMEOUT', 60000)
     }
   }
 }
