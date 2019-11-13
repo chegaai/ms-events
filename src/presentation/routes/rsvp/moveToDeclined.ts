@@ -21,7 +21,7 @@ export default function factory (service: EventService) {
         }
       },
       additionalProperties: false,
-      required: ['users']
+      required: ['userEmails']
     }),
     rescue(async (req: IExpressoRequest<{ userEmails: string[] }, { eventId: string }>, res: Response) => {
       const userEmails = req.body.userEmails
