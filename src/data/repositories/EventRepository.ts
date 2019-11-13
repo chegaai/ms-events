@@ -1,8 +1,8 @@
-import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
+import { Db, ObjectId } from 'mongodb'
 import { inject, injectable } from 'tsyringe'
-import { Db } from 'mongodb'
 import { Event } from '../../domain/event/Event'
 import { SerializedEvent } from '../../domain/event/structures/SerializedEvent'
+import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 
 @injectable()
 export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
@@ -30,5 +30,15 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
 
   async getAll (page: number, size: number): Promise<PaginatedQueryResult<Event>> {
     return this.runPaginatedQuery({ deletedAt: null }, page, size)
+  }
+
+  async listUpcoming (groupId: ObjectId, page: number, size: number) {
+    const today = new Date()
+    return this.runPaginatedQuery({ groups: { $in: [groupId] }, deletedAt: null, startAt: { $gte: today } }, page, size)
+  }
+
+  async listPast (groupId: ObjectId, page: number, size: number) {
+    const today = new Date()
+    return this.runPaginatedQuery({ groups: { $in: [groupId] }, deletedAt: null, startAt: { $lt: today } }, page, size)
   }
 }

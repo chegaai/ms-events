@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { InvalidEventError } from '../../../domain/event/errors/InvalidEventError'
 
-export function factory (service: EventService) {
+export default function factory (service: EventService) {
   return [
     rescue(async (req: Request, res: Response) => {
       const eventId = req.params.eventId
