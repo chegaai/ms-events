@@ -9,7 +9,7 @@ import { InvalidOwnerError } from '../../../domain/event/errors/InvalidOwnerErro
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
 import { ExpressoExtendedRequest } from '../structures/ExpressoExtendedRequest'
 
-export function factory (service: EventService) {
+export default function factory (service: EventService) {
   return [
     validate({
       type: 'object',
@@ -115,7 +115,7 @@ export function factory (service: EventService) {
       const event = await service.create(req.onBehalfOf, eventData)
 
       res.status(201)
-        .json(event)
+        .json(event.toObject())
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
       if (err instanceof OrganizerNotFoundError) return next(boom.notFound(err.message, { code: 'organizer_not_found' }))

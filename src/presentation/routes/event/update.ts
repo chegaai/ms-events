@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
 
-export function factory (service: EventService) {
+export default function factory (service: EventService) {
   return [
     validate({
       type: 'object',

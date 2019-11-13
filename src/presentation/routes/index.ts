@@ -1,9 +1,11 @@
-import { factory as create } from './event/create'
-import { factory as update } from './event/update'
-import { factory as remove } from './event/remove'
-import { factory as listAll } from './event/listAll'
-import { factory as find } from './event/find'
-import { factory as addRsvp } from './event/addRsvp'
+import find from './event/find'
+import create from './event/create'
+import update from './event/update'
+import remove from './event/remove'
+import listAll from './event/listAll'
+import addRsvp from './event/addRsvp'
+import listPast from './event/listPast'
+import listUpcoming from './event/listUpcoming'
 
 
 export const routes = {
@@ -12,5 +14,7 @@ export const routes = {
   remove,
   find,
   listAll,
-  addRsvp
+  addRsvp,
+  listPast,
+  listUpcoming
 }

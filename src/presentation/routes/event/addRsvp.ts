@@ -8,7 +8,7 @@ import { RSVPResponses } from '../../../domain/event/structures/Types'
 import { ExpressoExtendedRequest } from '../structures/ExpressoExtendedRequest'
 import { RSVPOutOfDateError } from '../../../domain/event/errors/RSVPOutOfDateError'
 
-export function factory (service: EventService) {
+export default function factory (service: EventService) {
   return [
     validate({
       type: 'object',
@@ -40,7 +40,7 @@ export function factory (service: EventService) {
       const event = await service.addRSVP(eventId, userId, rsvpData)
 
       res.status(200)
-        .json(event)
+        .json(event.toObject())
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
       if (err instanceof GroupNotFoundError) return next(boom.notFound(err.message, { code: 'group_not_found' }))
