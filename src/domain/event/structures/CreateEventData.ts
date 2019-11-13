@@ -19,4 +19,5 @@ export interface CreateEventData {
   agenda: AgendaSlot[]
   attendees?: Attendee[]
   waitingList?: Attendee[]
+  publicSince?: Date
 }
