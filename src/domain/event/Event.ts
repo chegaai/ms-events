@@ -1,10 +1,11 @@
 import { ObjectId } from 'bson'
-import { BaseEntity, BaseEntityData } from '../BaseEntity'
 import stringToObjectId from 'string-to-objectid'
+import { BaseEntity, BaseEntityData } from '../BaseEntity'
 import { UpdateEventData } from './structures/UpdateEventData'
 import { CreateEventData } from './structures/CreateEventData'
-import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType, RSVPStates } from './structures/Types'
 import { RSVPOutOfDateError } from './errors/RSVPOutOfDateError'
+import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType, RSVPStates } from './structures/Types'
+import { UserNotAllowedError } from './errors/UserNotAllowedError'
 
 export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
@@ -101,6 +102,28 @@ export class Event extends BaseEntity {
     return this
   }
 
+  moveToList (requesterId: ObjectId, usersToMove: string[], listToMove: RSVPStates) {
+    if (this.isOrganizer(requesterId) || this.isOwner(requesterId)) {
+      for (let userEmail of usersToMove) {
+        const attendee = this.attendees.find(user => user.email === userEmail) || this.waitingList.find(user => user.email === userEmail)
+        if (!attendee) continue
+        attendee.rsvp = listToMove
+
+        if (listToMove === RSVPStates.WaitingList) {
+          this.waitingList.push(attendee)
+          this.attendees.filter(user => user.email !== userEmail)
+          continue
+        }
+
+        this.attendees.push(attendee)
+        this.waitingList.filter(user => user.email !== userEmail)
+      }
+      return this
+    }
+
+    throw new UserNotAllowedError(requesterId.toHexString())
+  }
+
   addAttendee (attendee: Attendee) {
     if (!this.isRSVPOpen()) throw new RSVPOutOfDateError(this.rsvp)
 
@@ -131,6 +154,14 @@ export class Event extends BaseEntity {
     // Otherwise add to list
     this.attendees.push(attendee)
     return this
+  }
+
+  private isOwner (userId: ObjectId) {
+    return userId.equals(this.owner)
+  }
+
+  private isOrganizer (userId: ObjectId) {
+    return !!this.organizers.find((organizer) => organizer.equals(userId))
   }
 
   /**

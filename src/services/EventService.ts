@@ -13,8 +13,15 @@ import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { GroupClient } from '../data/clients/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
-import { Attendee, AgendaSlot } from '../domain/event/structures/Types'
+import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
+import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
+
+export enum UserTypes {
+  USER,
+  ORGANIZER,
+  OWNER
+}
 
 @injectable()
 export class EventService {
@@ -26,31 +33,43 @@ export class EventService {
   ) { }
 
   async create (owner: string, creationData: CreateEventData): Promise<Event> {
-    await this.findOwner(owner as string)
+    await this.findUser(owner as string, UserTypes.OWNER)
     const groups = await Promise.all(creationData.groups.map(id => this.findGroup(id as string)))
 
     const foundersAndOrganizers: string[] = groups
       .map((group) => [group.founder, ...group.organizers]).flat()
-    if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
 
-    if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findOrganizer(id as string)))
+    if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
+    if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findUser(id as string, UserTypes.ORGANIZER)))
 
     creationData.banner = await this.blobStorageClient.uploadBase64(creationData.banner)
-
     const event = Event.create(new ObjectId(), { ...creationData, owner })
 
     return this.repository.save(event)
   }
 
-  private async findOrganizer (organizerId: string) {
-    const organizer = await this.userClient.findUserById(organizerId)
-    if (!organizer) throw new OrganizerNotFoundError(organizerId)
-    return organizer
+  async moveToList (founderOrOrganizerId: string, eventId: string, userEmails: string[], list: RSVPStates) {
+    const event = await this.find(eventId)
+    await this.findUser(founderOrOrganizerId, UserTypes.USER)
+
+    event.moveToList(new ObjectId(founderOrOrganizerId), userEmails, list)
+
+    await this.repository.save(event)
+    return event
   }
 
-  private async findOwner (userId: string) {
+  private async findUser (userId: string, userType: UserTypes) {
     const user = await this.userClient.findUserById(userId)
-    if (!user) throw new OwnerNotFoundError(userId)
+    if (!user) {
+      switch (userType) {
+        case UserTypes.OWNER:
+          throw new OwnerNotFoundError(userId)
+        case UserTypes.ORGANIZER:
+          throw new OrganizerNotFoundError(userId)
+        default:
+          throw new UserNotFoundError(userId)
+      }
+    }
     return user
   }
 
