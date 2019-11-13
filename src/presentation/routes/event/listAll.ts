@@ -9,20 +9,25 @@ export default function factory (service: EventService) {
       type: 'object',
       properties: {
         page: { type: 'number', default: 0 },
-        size: { type: 'number', default: 10 }
+        size: { type: 'number', default: 10 },
+        unpublished: { type: 'boolean' }
       }
     }),
     rescue(async (req: Request, res: Response) => {
-      const events = await service.listAll(req.query.page, req.query.size)
+      const { page, size, unpublished = false } = req.query
 
-      res.status(200)
-        .set({
-          'x-range-from': events.range.from,
-          'x-range-to': events.range.to,
-          'x-range-total': events.total,
-          'x-range-size': events.count
-        })
-        .json(events.results.map(event => event.toObject()))
+      const searchResult = await service.listAll(page, size, !unpublished)
+
+      const { count, range, results, total } = searchResult
+
+      const status = total > count ? 206 : 200
+
+      if (status === 206) {
+        res.append('x-content-range', `${range.from}-${range.to}/${total}`)
+      }
+
+      res.status(status)
+        .json(results.map(result => result.toObject()))
     }),
     (err: any, _req: Request, _res: Response, next: NextFunction) => {
       next(err)

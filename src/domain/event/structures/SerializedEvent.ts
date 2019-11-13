@@ -24,5 +24,6 @@ export interface SerializedEvent {
   agenda: AgendaSlot[]
   createdAt: Date
   updatedAt: Date
-  deletedAt: Nullable<Date>
+  deletedAt: Nullable<Date>,
+  publicSince: Date
 }

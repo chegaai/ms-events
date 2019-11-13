@@ -28,8 +28,21 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     return Event.create(_id, creationData)
   }
 
-  async getAll (page: number, size: number): Promise<PaginatedQueryResult<Event>> {
-    return this.runPaginatedQuery({ deletedAt: null }, page, size)
+  async getAll (page: number, size: number, publicOnly = true): Promise<PaginatedQueryResult<Event>> {
+    const query: Record<string, any> = {
+      deletedAt: null
+    }
+
+    if (publicOnly) {
+      const now = new Date()
+      now.setHours(0)
+      now.setMinutes(0)
+      now.setMilliseconds(0)
+
+      query.publicSince = { $lte: now }
+    }
+
+    return this.runPaginatedQuery(query, page, size)
   }
 
   async listUpcoming (groupId: ObjectId, page: number, size: number) {

@@ -104,7 +104,7 @@ export class EventService {
     return event
   }
 
-  async listAll (page: number = 0, size: number = 10): Promise<PaginatedQueryResult<Event>> {
-    return this.repository.getAll(page, size)
+  async listAll (page: number = 0, size: number = 10, publicOnly?: boolean): Promise<PaginatedQueryResult<Event>> {
+    return this.repository.getAll(page, size, publicOnly)
   }
 }

@@ -38,6 +38,7 @@ export class Event extends BaseEntity {
   tags: string[] = []
   pictures: Picture[] = []
   groups: ObjectId[] = []
+  publicSince: Date = new Date()
 
   static create (id: ObjectId, data: CreateEventData & BaseEntityData): Event {
     const event = new Event()
@@ -68,6 +69,8 @@ export class Event extends BaseEntity {
     if (data.deletedAt) event.deletedAt = data.deletedAt
     if (data.updatedAt) event.updatedAt = data.updatedAt
 
+    if (data.publicSince) event.publicSince = data.publicSince
+
     return event
   }
 
@@ -94,6 +97,7 @@ export class Event extends BaseEntity {
     this.agenda = dataToUpdate.agenda || this.agenda
     this.attendees = dataToUpdate.attendees || this.attendees
     this.updatedAt = new Date()
+    this.publicSince = dataToUpdate.publicSince || this.publicSince
     return this
   }
 
@@ -215,7 +219,8 @@ export class Event extends BaseEntity {
       agenda: this.agenda,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      deletedAt: this.deletedAt
+      deletedAt: this.deletedAt,
+      publicSince: this.publicSince
     }
   }
 }
