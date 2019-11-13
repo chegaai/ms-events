@@ -24,5 +24,7 @@ export const app = expresso(async (app, config: IAppConfig, environment: string)
   app.get('/:groupId/past', routes.listPast(services.event))
   app.get('/:groupId/upcoming', routes.listUpcoming(services.event))
 
+  app.put('/:eventId', routes.updateAgenda(services.event))
+
   app.use(errors(environment))
 })
