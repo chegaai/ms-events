@@ -19,4 +19,5 @@ export interface UpdateEventData {
   groups: string[]
   attendees: Attendee[]
   agenda: AgendaSlot[]
+  publicSince: Date
 }

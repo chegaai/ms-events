@@ -21,6 +21,8 @@ export const app = expresso(async (app, config: IAppConfig, environment: string)
   app.put('/:eventId', routes.update(services.event))
   app.delete('/:eventId', routes.remove(services.event))
   app.patch('/:eventId/rsvps', routes.addRsvp(services.event))
+  app.get('/:groupId/past', routes.listPast(services.event))
+  app.get('/:groupId/upcoming', routes.listUpcoming(services.event))
 
   app.use(errors(environment))
 })

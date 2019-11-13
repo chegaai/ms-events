@@ -74,6 +74,16 @@ export class EventService {
     await this.repository.save(event)
   }
 
+  async listUpcoming (groupId: string, page: number = 0, size: number = 10) {
+    const group = await this.findGroup(groupId)
+    return this.repository.listUpcoming(group.id, page, size)
+  }
+
+  async listPast (groupId: string, page: number = 0, size: number = 10) {
+    const group = await this.findGroup(groupId)
+    return this.repository.listPast(group.id, page, size)
+  }
+
   async addRSVP (eventId: string, userId: string, rsvpData: Pick<Attendee, 'inquiryResponses' | 'rsvp'>) {
     const event = await this.find(eventId)
     const user = await this.userClient.findUserById(userId)
@@ -94,7 +104,7 @@ export class EventService {
     return event
   }
 
-  async listAll (page: number = 0, size: number = 10): Promise<PaginatedQueryResult<Event>> {
-    return this.repository.getAll(page, size)
+  async listAll (page: number = 0, size: number = 10, publicOnly?: boolean): Promise<PaginatedQueryResult<Event>> {
+    return this.repository.getAll(page, size, publicOnly)
   }
 }

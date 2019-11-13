@@ -9,17 +9,12 @@ export default function factory (service: EventService) {
       type: 'object',
       properties: {
         page: { type: 'number', default: 0 },
-        size: { type: 'number', default: 10 },
-        unpublished: { type: 'boolean' }
+        size: { type: 'number', default: 10 }
       }
     }),
     rescue(async (req: Request, res: Response) => {
-      const { page, size, unpublished = false } = req.query
-
-      const searchResult = await service.listAll(page, size, !unpublished)
-
+      const searchResult = await service.listPast(req.params.groupId, req.query.page, req.query.size)
       const { count, range, results, total } = searchResult
-
       const status = total > count ? 206 : 200
 
       if (status === 206) {
