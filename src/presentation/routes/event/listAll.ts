@@ -1,7 +1,8 @@
 import rescue from 'express-rescue'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { validate } from '@expresso/validator'
+import { IExpressoRequest } from '@expresso/app'
 
 export default function factory (service: EventService) {
   return [
@@ -13,13 +14,10 @@ export default function factory (service: EventService) {
         unpublished: { type: 'boolean' }
       }
     }),
-    rescue(async (req: Request, res: Response) => {
+    rescue(async (req: IExpressoRequest<unknown, unknown, { page: number, size: number, unpublished?: boolean }>, res: Response) => {
       const { page, size, unpublished = false } = req.query
-
       const searchResult = await service.listAll(page, size, !unpublished)
-
       const { count, range, results, total } = searchResult
-
       const status = total > count ? 206 : 200
 
       if (status === 206) {
@@ -29,7 +27,7 @@ export default function factory (service: EventService) {
       res.status(status)
         .json(results.map(result => result.toObject()))
     }),
-    (err: any, _req: Request, _res: Response, next: NextFunction) => {
+    (err: any, _req: IExpressoRequest, _res: Response, next: NextFunction) => {
       next(err)
     }
   ]

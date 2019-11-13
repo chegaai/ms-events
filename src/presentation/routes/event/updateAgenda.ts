@@ -1,9 +1,11 @@
 import { EventService } from '../../../services/EventService'
 import { validate } from '@expresso/validator'
 import rescue from 'express-rescue'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { EventNotFoundError } from '../../../domain/event/errors/EventNotFoundError'
 import { boom } from '@expresso/errors'
+import { IExpressoRequest } from '@expresso/app'
+import { AgendaSlot } from '../../../domain/event/structures/Types'
 
 export default function factory (service: EventService) {
   return [
@@ -18,10 +20,10 @@ export default function factory (service: EventService) {
           index: { type: 'number' }
         },
         additionalProperties: false,
-        required: [ 'title', 'speaker', 'at', 'index' ]
+        required: ['title', 'speaker', 'at', 'index']
       }
     }),
-    rescue(async (req: Request, res: Response) => {
+    rescue(async (req: IExpressoRequest<AgendaSlot[], { eventId: string }>, res: Response) => {
       const entries = req.body
       const { eventId } = req.params
 
@@ -30,7 +32,7 @@ export default function factory (service: EventService) {
       res.status(200)
         .json(event.toObject())
     }),
-    (err: Error, _req: Request, _res: Response, next: NextFunction) => {
+    (err: Error, _req: IExpressoRequest, _res: Response, next: NextFunction) => {
       if (err instanceof EventNotFoundError) {
         return next(boom.notFound(err.message, { code: 'event-not-found' }))
       }

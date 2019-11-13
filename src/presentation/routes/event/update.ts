@@ -1,9 +1,11 @@
 import rescue from 'express-rescue'
 import { boom } from '@expresso/errors'
 import { validate } from '@expresso/validator'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
+import { IExpressoRequest } from '@expresso/app'
+import { UpdateEventData } from '../../../domain/event/structures/UpdateEventData'
 
 export default function factory (service: EventService) {
   return [
@@ -106,7 +108,7 @@ export default function factory (service: EventService) {
       },
       additionalProperties: false
     }),
-    rescue(async (req: Request, res: Response) => {
+    rescue(async (req: IExpressoRequest<Partial<UpdateEventData>, { eventId: string }>, res: Response) => {
       const eventData = req.body
       const { eventId } = req.params
       const event = await service.update(eventId, eventData)
@@ -114,7 +116,7 @@ export default function factory (service: EventService) {
       res.status(200)
         .json(event)
     }),
-    (err: any, _req: Request, _res: Response, next: NextFunction) => {
+    (err: any, _req: IExpressoRequest, _res: Response, next: NextFunction) => {
       if (err instanceof GroupNotFoundError) return next(boom.notFound(err.message, { code: 'group_not_found' }))
 
       next(err)

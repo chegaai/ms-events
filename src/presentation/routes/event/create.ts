@@ -1,13 +1,14 @@
 import rescue from 'express-rescue'
 import { boom } from '@expresso/errors'
 import { validate } from '@expresso/validator'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { OrganizerNotFoundError } from '../../../domain/event/errors/OrganizerNotFoundError'
 import { OwnerNotFoundError } from '../../../domain/event/errors/OwnerNotFoundError'
 import { InvalidOwnerError } from '../../../domain/event/errors/InvalidOwnerError'
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
-import { ExpressoExtendedRequest } from '../structures/ExpressoExtendedRequest'
+import { IExpressoRequest } from '@expresso/app'
+import { CreateEventData } from '../../../domain/event/structures/CreateEventData'
 
 export default function factory (service: EventService) {
   return [
@@ -110,14 +111,14 @@ export default function factory (service: EventService) {
       required: ['name', 'description', 'seats', 'type', 'startAt', 'endAt', 'needsDocument', 'place', 'groups', 'rsvp'],
       additionalProperties: false
     }),
-    rescue(async (req: ExpressoExtendedRequest, res: Response) => {
+    rescue(async (req: IExpressoRequest<CreateEventData>, res: Response) => {
       const eventData = req.body
-      const event = await service.create(req.onBehalfOf, eventData)
+      const event = await service.create(req.onBehalfOf as string, eventData)
 
       res.status(201)
         .json(event.toObject())
     }),
-    (err: any, _req: Request, _res: Response, next: NextFunction) => {
+    (err: any, _req: IExpressoRequest, _res: Response, next: NextFunction) => {
       if (err instanceof OrganizerNotFoundError) return next(boom.notFound(err.message, { code: 'organizer_not_found' }))
       if (err instanceof InvalidOwnerError) return next(boom.forbidden(err.message, { code: 'invalid_owner' }))
       if (err instanceof OwnerNotFoundError) return next(boom.notFound(err.message, { code: 'owner_not_found' }))
