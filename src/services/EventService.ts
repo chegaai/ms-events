@@ -14,12 +14,14 @@ import { GroupClient } from '../data/clients/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
 import { Attendee } from '../domain/event/structures/Types'
+import { BlobStorageClient } from '../data/clients/BlobStorageClient'
 
 @injectable()
 export class EventService {
   constructor (
     private readonly repository: EventRepository,
     private readonly userClient: UserClient,
+    private readonly blobStorageClient: BlobStorageClient,
     private readonly groupClient: GroupClient
   ) { }
 
@@ -32,6 +34,8 @@ export class EventService {
     if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
 
     if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findOrganizer(id as string)))
+
+    creationData.banner = await this.blobStorageClient.uploadBase64(creationData.banner)
 
     const event = Event.create(new ObjectId(), { ...creationData, owner })
 
@@ -61,6 +65,13 @@ export class EventService {
     if (!currentEvent) throw new EventNotFoundError(id)
 
     currentEvent.update(dataToUpdate)
+    if (dataToUpdate.pictures) await Promise.all(dataToUpdate.pictures.map(async (picture) => {
+      picture.link = await this.blobStorageClient.uploadBase64(picture.link)
+      return picture 
+    }))
+
+    if (dataToUpdate.banner)
+      dataToUpdate.banner = await this.blobStorageClient.uploadBase64(dataToUpdate.banner)
 
     return this.repository.save(currentEvent)
   }
