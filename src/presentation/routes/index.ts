@@ -6,7 +6,7 @@ import listAll from './event/listAll'
 import addRsvp from './event/addRsvp'
 import listPast from './event/listPast'
 import listUpcoming from './event/listUpcoming'
-
+import updateAgenda from './event/updateAgenda'
 
 export const routes = {
   create,
@@ -16,5 +16,6 @@ export const routes = {
   listAll,
   addRsvp,
   listPast,
-  listUpcoming
+  listUpcoming,
+  updateAgenda
 }

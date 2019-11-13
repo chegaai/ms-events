@@ -13,7 +13,7 @@ import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { GroupClient } from '../data/clients/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
-import { Attendee } from '../domain/event/structures/Types'
+import { Attendee, AgendaSlot } from '../domain/event/structures/Types'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
 
 @injectable()
@@ -67,7 +67,7 @@ export class EventService {
     currentEvent.update(dataToUpdate)
     if (dataToUpdate.pictures) await Promise.all(dataToUpdate.pictures.map(async (picture) => {
       picture.link = await this.blobStorageClient.uploadBase64(picture.link)
-      return picture 
+      return picture
     }))
 
     if (dataToUpdate.banner)
@@ -117,5 +117,15 @@ export class EventService {
 
   async listAll (page: number = 0, size: number = 10, publicOnly?: boolean): Promise<PaginatedQueryResult<Event>> {
     return this.repository.getAll(page, size, publicOnly)
+  }
+
+  async updateAgenda (id: string, entries: AgendaSlot[]): Promise<Event> {
+    const event = await this.find(id)
+
+    event.agenda = entries
+
+    await this.repository.save(event)
+
+    return event
   }
 }
