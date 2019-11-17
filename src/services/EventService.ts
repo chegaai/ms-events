@@ -2,6 +2,7 @@
 import { ObjectId } from 'bson'
 import { injectable } from 'tsyringe'
 import { Readable, Transform } from 'stream'
+import { Nullable } from '../utils/Nullable'
 import { Event } from '../domain/event/Event'
 import { UserClient } from '../data/clients/UserClient'
 import { GroupClient } from '../data/clients/GroupClient'
@@ -17,9 +18,6 @@ import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
 import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
 import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
-import { BlobStorageClient } from '../data/clients/BlobStorageClient'
-import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
-import { Nullable } from '../utils/Nullable'
 
 export enum UserTypes {
   USER,
