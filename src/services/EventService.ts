@@ -16,6 +16,7 @@ import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
 import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
 import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
+import { Nullable } from '../utils/Nullable'
 
 export enum UserTypes {
   USER,
@@ -58,7 +59,7 @@ export class EventService {
     return event
   }
 
-  private async findUser (userId: string, userType: UserTypes) {
+  private async findUser (userId: string, userType: UserTypes = UserTypes.USER) {
     const user = await this.userClient.findUserById(userId)
     if (!user) {
       switch (userType) {
@@ -104,14 +105,16 @@ export class EventService {
     await this.repository.save(event)
   }
 
-  async listUpcoming (groupId: string, page: number = 0, size: number = 10) {
+  async listUpcoming (groupId: string, userId: Nullable<string>, page: number = 0, size: number = 10) {
     const group = await this.findGroup(groupId)
-    return this.repository.listUpcoming(group.id, page, size)
+    const ownerId = userId ? new ObjectId(await this.findUser(userId)) : null
+    return this.repository.listUpcoming(group.id, ownerId, page, size)
   }
 
-  async listPast (groupId: string, page: number = 0, size: number = 10) {
+  async listPast (groupId: string, userId: Nullable<string>, page: number = 0, size: number = 10) {
     const group = await this.findGroup(groupId)
-    return this.repository.listPast(group.id, page, size)
+    const ownerId = userId ? new ObjectId(await this.findUser(userId)) : null
+    return this.repository.listPast(group.id, ownerId, page, size)
   }
 
   async addRSVP (eventId: string, userId: string, rsvpData: Pick<Attendee, 'inquiryResponses' | 'rsvp'>) {

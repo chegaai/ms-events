@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe'
 import { Event } from '../../domain/event/Event'
 import { SerializedEvent } from '../../domain/event/structures/SerializedEvent'
 import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
+import { Nullable } from '../../utils/Nullable'
 
 @injectable()
 export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
@@ -45,13 +46,24 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     return this.runPaginatedQuery(query, page, size)
   }
 
-  async listUpcoming (groupId: ObjectId, page: number, size: number) {
-    const today = new Date()
-    return this.runPaginatedQuery({ groups: { $in: [groupId] }, deletedAt: null, startAt: { $gte: today } }, page, size)
+  private getUserOwnedQuery (userId: ObjectId) {
+    return {
+      $or: [
+        { owner: userId },
+        { organizers: { $in: [userId] } }
+      ]
+    }
   }
 
-  async listPast (groupId: ObjectId, page: number, size: number) {
+  async listUpcoming (groupId: ObjectId, userId: Nullable<ObjectId>, page: number, size: number) {
     const today = new Date()
-    return this.runPaginatedQuery({ groups: { $in: [groupId] }, deletedAt: null, startAt: { $lt: today } }, page, size)
+    const belongsToUser = userId ? this.getUserOwnedQuery(userId) : {}
+    return this.runPaginatedQuery({ ...belongsToUser, groups: { $in: [groupId] }, deletedAt: null, startAt: { $gte: today } }, page, size)
+  }
+
+  async listPast (groupId: ObjectId, userId: Nullable<ObjectId>, page: number, size: number) {
+    const today = new Date()
+    const belongsToUser = userId ? this.getUserOwnedQuery(userId) : {}
+    return this.runPaginatedQuery({ ...belongsToUser, groups: { $in: [groupId] }, deletedAt: null, startAt: { $lt: today } }, page, size)
   }
 }
