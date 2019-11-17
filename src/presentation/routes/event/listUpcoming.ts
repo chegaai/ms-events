@@ -10,11 +10,14 @@ export default function factory (service: EventService) {
       type: 'object',
       properties: {
         page: { type: 'number', default: 0 },
-        size: { type: 'number', default: 10 }
-      }
+        size: { type: 'number', default: 10 },
+        mine: { type: 'boolean' }
+      },
+      additionalProperties: false
     }),
-    rescue(async (req: IExpressoRequest<unknown, { groupId: string }, { page: number, size: number }>, res: Response) => {
-      const searchResult = await service.listUpcoming(req.params.groupId, req.query.page, req.query.size)
+    rescue(async (req: IExpressoRequest<unknown, { groupId: string }, { page: number, mine: boolean, size: number }>, res: Response) => {
+      const belongsToUser = req.query.mine ? req.onBehalfOf as string : null
+      const searchResult = await service.listUpcoming(req.params.groupId, belongsToUser, req.query.page, req.query.size)
       const { count, range, results, total } = searchResult
       const status = total > count ? 206 : 200
 
