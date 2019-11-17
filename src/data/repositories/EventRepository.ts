@@ -1,6 +1,8 @@
+import { PassThrough } from 'stream'
 import { Db, ObjectId } from 'mongodb'
 import { inject, injectable } from 'tsyringe'
 import { Event } from '../../domain/event/Event'
+import { Attendee, RSVPStates } from '../../domain/event/structures/Types'
 import { SerializedEvent } from '../../domain/event/structures/SerializedEvent'
 import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 import { Nullable } from '../../utils/Nullable'
@@ -65,5 +67,20 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     const today = new Date()
     const belongsToUser = userId ? this.getUserOwnedQuery(userId) : {}
     return this.runPaginatedQuery({ ...belongsToUser, groups: { $in: [groupId] }, deletedAt: null, startAt: { $lt: today } }, page, size)
+  }
+
+  getRsvps (eventId: string | ObjectId, rsvpState: RSVPStates) {
+    const attendeesStream = this.collection.aggregate<Attendee>([
+      { $match: { _id: new ObjectId(eventId) } },
+      { $unwind: '$attendees' },
+      { $replaceRoot: { newRoot: '$attendees' } },
+      { $match: { rsvp: rsvpState } }
+    ], { cursor: { batchSize: 1 } })
+
+    const resultStream = new PassThrough()
+
+    attendeesStream.pipe(resultStream)
+
+    return resultStream
   }
 }

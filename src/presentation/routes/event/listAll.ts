@@ -14,7 +14,7 @@ export default function factory (service: EventService) {
         unpublished: { type: 'boolean' }
       }
     }),
-    rescue(async (req: IExpressoRequest<unknown, unknown, { page: number, size: number, unpublished?: boolean }>, res: Response) => {
+    rescue(async (req: IExpressoRequest<unknown, any, { page: number, size: number, unpublished?: boolean }>, res: Response) => {
       const { page, size, unpublished = false } = req.query
       const searchResult = await service.listAll(page, size, !unpublished)
       const { count, range, results, total } = searchResult

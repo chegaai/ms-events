@@ -1,19 +1,22 @@
 // import axios from 'axios'
 import { ObjectId } from 'bson'
 import { injectable } from 'tsyringe'
+import { Readable, Transform } from 'stream'
 import { Event } from '../domain/event/Event'
 import { UserClient } from '../data/clients/UserClient'
+import { GroupClient } from '../data/clients/GroupClient'
 import { PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
+import { BlobStorageClient } from '../data/clients/BlobStorageClient'
 import { EventRepository } from '../data/repositories/EventRepository'
 import { CreateEventData } from '../domain/event/structures/CreateEventData'
-import { OwnerNotFoundError } from '../domain/event/errors/OwnerNotFoundError'
-import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
-import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
-import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
-import { GroupClient } from '../data/clients/GroupClient'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
+import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
+import { OwnerNotFoundError } from '../domain/event/errors/OwnerNotFoundError'
+import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
+import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
+import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
 import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
 import { Nullable } from '../utils/Nullable'
@@ -22,6 +25,10 @@ export enum UserTypes {
   USER,
   ORGANIZER,
   OWNER
+}
+
+function validateRsvpState (state: any): state is RSVPStates {
+  return Object.values(RSVPStates).includes(state)
 }
 
 @injectable()
@@ -149,5 +156,38 @@ export class EventService {
     await this.repository.save(event)
 
     return event
+  }
+
+  async getRsvps (eventId: string, state: string) {
+    if (!validateRsvpState(state)) {
+      return new Readable()
+    }
+
+    const event = await this.find(eventId)
+
+    const attendeeHeaders = 'name,email,rsvp,timestamp'
+
+    const headerLine = event.inquiries.reduce((result, question) => {
+      return `${result},"${question.title}"`
+    }, attendeeHeaders)
+
+    const rsvpsStream = this.repository.getRsvps(eventId, state)
+
+    const transformStream = new Transform({
+      writableObjectMode: true,
+      transform: ({ inquiryResponses, ...attendee }: Attendee, _encoding, callback) => {
+        const responses = inquiryResponses.map(response => response.response)
+        const data = Object.values(attendee)
+
+        const line = [ ...data, ...responses ].join(',')
+
+        callback(null, line)
+      }
+    })
+
+    transformStream.write(headerLine)
+    rsvpsStream.pipe(transformStream)
+
+    return transformStream
   }
 }
