@@ -127,9 +127,11 @@ export class EventService {
   async addRSVP (eventId: string, userId: string, rsvpData: Pick<Attendee, 'inquiryResponses' | 'rsvp'>) {
     const event = await this.find(eventId)
     const user = await this.userClient.findUserById(userId)
+
     event.addAttendee({
       name: user.name,
       email: user.email,
+      document: user.document,
       timestamp: new Date(),
       ...rsvpData
     })
@@ -165,7 +167,7 @@ export class EventService {
 
     const event = await this.find(eventId)
 
-    const attendeeHeaders = 'name,email,rsvp,timestamp'
+    const attendeeHeaders = 'name,email,document,rsvp,timestamp'
 
     const headerLine = event.inquiries.reduce((result, question) => {
       return `${result},"${question.title}"`
@@ -177,7 +179,14 @@ export class EventService {
       writableObjectMode: true,
       transform: ({ inquiryResponses, ...attendee }: Attendee, _encoding, callback) => {
         const responses = inquiryResponses.map(response => response.response)
-        const data = Object.values(attendee)
+
+        const data = [
+          attendee.name,
+          attendee.email,
+          attendee.document,
+          attendee.rsvp,
+          attendee.timestamp
+        ]
 
         const line = [ ...data, ...responses ].join(',')
 

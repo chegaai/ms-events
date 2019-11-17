@@ -38,6 +38,7 @@ export interface Attendee {
   name: string
   email: string
   inquiryResponses: AttendeeResponse[]
+  document: string
   rsvp: RSVPStates
   timestamp: Date
 }
