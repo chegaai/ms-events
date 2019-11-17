@@ -1,8 +1,10 @@
 import rescue from 'express-rescue'
-import { Request, Response } from 'express'
 import { validate } from '@expresso/validator'
+import { Request, Response, NextFunction } from 'express'
 import { EventService } from '../../../services/EventService'
 import { RSVPStates } from '../../../domain/event/structures/Types'
+import { EventNotFoundError } from '../../../domain/event/errors/EventNotFoundError'
+import { boom } from '@expresso/errors'
 
 export function factory (service: EventService) {
   return [
@@ -20,12 +22,19 @@ export function factory (service: EventService) {
       const { id: eventId } = req.params
       const { state = RSVPStates.Going } = req.query
 
-      const rsvpStream = service.getRsvps(eventId, state)
+      const rsvpStream = await service.getRsvps(eventId, state)
 
       res.status(200)
       res.contentType('text/csv')
       rsvpStream.pipe(res)
-    })
+    }),
+    (err: Error, _req: Request, _res: Response, next: NextFunction) => {
+      if (err instanceof EventNotFoundError) {
+        return next(boom.notFound(err.message, { code: 'event-not-found' }))
+      }
+
+      next(err)
+    }
   ]
 }
 
