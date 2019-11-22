@@ -4,14 +4,15 @@
 
 replicaCount: 1
 
-name: ms-group
+name: ms-events
 env: production
 maxReplicas: 10
 cpuUsage: 60
+memoryUsage: 80
 
 image:
-  registry: gcr.io/nindoo-214818
-  name: group-ms-group
+  registry: chegaai.azurecr.io
+  name: ms-events
   tag: v1.0.0
   pullPolicy: IfNotPresent
 
@@ -25,3 +26,7 @@ environment: {}
 resources:
   requests:
     cpu: 250m
+    memory: 128M
+  limits:
+    cpu: 500m
+    memory: 256M
