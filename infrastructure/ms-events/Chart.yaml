@@ -1,4 +1,4 @@
 apiVersion: v1
-description: Group group microservice
-name: ms-group
+description: Events microservice
+name: ms-events
 version: 0.1.0
