@@ -27,7 +27,8 @@ export class Event extends BaseEntity {
     complement: '',
     country: '',
     city: '',
-    state: ''
+    state: '',
+    placeId: ''
   }
   rsvp: RSVP = {
     openAt: new Date(),
@@ -48,6 +49,7 @@ export class Event extends BaseEntity {
     event.description = data.description
     event.banner = data.banner
     event.seats = data.seats
+    event.place.placeId = data.place.placeId
     event.type = data.type
     event.startAt = data.startAt
     event.endAt = data.endAt
@@ -236,7 +238,8 @@ export class Event extends BaseEntity {
         complement: this.place.complement,
         country: this.place.country,
         city: this.place.city,
-        state: this.place.state
+        state: this.place.state,
+        placeId: this.place.placeId
       },
       rsvp: {
         openAt: this.rsvp.openAt,
