@@ -64,6 +64,7 @@ export interface Place {
   country: string
   city: string
   state: string
+  placeId: string
 }
 
 export interface RSVP {

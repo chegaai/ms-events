@@ -71,12 +71,13 @@ export default function factory (service: EventService) {
             zipCode: { type: 'string' },
             number: { type: 'string' },
             complement: { type: 'string' },
+            placeId: { type: 'string' },
             country: { type: 'string' },
             city: { type: 'string' },
             state: { type: 'string' },
           },
           additionalProperties: false,
-          required: ['address', 'zipCode', 'number', 'country', 'city', 'state']
+          required: ['address', 'zipCode', 'number', 'country', 'city', 'state', 'placeId']
         },
         tags: {
           type: 'array',

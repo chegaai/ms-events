@@ -70,11 +70,12 @@ export default function factory (service: EventService) {
             number: { type: 'string' },
             complement: { type: 'string' },
             country: { type: 'string' },
+            placeId: { type: 'string' },
             city: { type: 'string' },
             state: { type: 'string' },
           },
           additionalProperties: false,
-          required: ['address', 'zipCode', 'number', 'country', 'city', 'state']
+          required: ['address', 'zipCode', 'number', 'country', 'city', 'state', 'placeId']
         },
         tags: {
           type: 'array',
