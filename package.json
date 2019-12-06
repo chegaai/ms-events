@@ -27,7 +27,7 @@
     "@expresso/validator": "^1.0.4",
     "@nindoo/mongodb-data-layer": "^2.0.2",
     "axios": "^0.19.0",
-    "azure-blob-storage-client": "0.0.2",
+    "azure-blob-storage-client": "0.0.8",
     "bson": "^4.0.2",
     "express-rescue": "^1.1.22",
     "reflect-metadata": "^0.1.13",
