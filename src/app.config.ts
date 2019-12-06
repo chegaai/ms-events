@@ -53,10 +53,10 @@ export const config: IAppConfig = {
   },
   azure:{
     storage: {
-      accountName: env.get('AZURE_STORAGE_ACCOUNT_NAME', 'chegaai'),
-      accountAccessKey: env.get('AZURE_STORAGE_ACCOUNT_ACCESS_KEY', ''),
-      containerName: env.get('AZURE_STORAGE_CONTAINER_NAME', 'events'),
-      timeOut: env.get('AZURE_STORAGE_TIMEOUT', 60000)
+      accountName: env.get('MS_EVENTS_AZURE_STORAGE_ACCOUNT_NAME', 'chegaai'),
+      accountAccessKey: env.get('MS_EVENTS_AZURE_STORAGE_ACCOUNT_ACCESS_KEY', ''),
+      containerName: env.get('MS_EVENTS_AZURE_STORAGE_CONTAINER_NAME', 'events'),
+      timeOut: env.get('MS_EVENTS_AZURE_STORAGE_TIMEOUT', 60000)
     }
   }
 }

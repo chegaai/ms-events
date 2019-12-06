@@ -114,7 +114,7 @@ export default function factory (service: EventService) {
     }),
     rescue(async (req: IExpressoRequest<CreateEventData>, res: Response) => {
       const eventData = req.body
-      const event = await service.create(req.onBehalfOf as string, eventData)
+      const event = await service.create('5ddbe2b325f79200107a080e', eventData)
 
       res.status(201)
         .json(event.toObject())
