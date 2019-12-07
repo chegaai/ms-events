@@ -39,6 +39,8 @@ spec:
               value: {{ required "Storage access key is required" .Values.environment.AZURE_STORAGE_ACCOUNT_ACCESS_KEY | quote}}
             - name: AZURE_STORAGE_CONTAINER_NAME
               value: {{ default "events" .Values.environment.AZURE_STORAGE_CONTAINER_NAME | quote}}
+            - name: NODE_ENV
+              value: {{.Release.Namespace}}
           ports:
             - name: http
               containerPort: 3000
