@@ -38,6 +38,13 @@ export class EventService {
     private readonly groupClient: GroupClient
   ) { }
 
+  private async uploadBase64(base64: string){
+    const url = await this.blobStorageClient.upload(base64)
+    if(!url)
+      throw Error() //TODO: throw better error handler
+    return url
+  }
+
   async create (owner: string, creationData: CreateEventData): Promise<Event> {
     await this.findUser(owner as string, UserTypes.OWNER)
     const groups = await Promise.all(creationData.groups.map(id => this.findGroup(id as string)))
@@ -48,7 +55,7 @@ export class EventService {
     if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
     if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findUser(id as string, UserTypes.ORGANIZER)))
 
-    creationData.banner = await this.blobStorageClient.uploadBase64(creationData.banner)
+    creationData.banner = await this.uploadBase64(creationData.banner)
     const event = Event.create(new ObjectId(), { ...creationData, owner })
 
     return this.repository.save(event)
@@ -91,12 +98,12 @@ export class EventService {
 
     currentEvent.update(dataToUpdate)
     if (dataToUpdate.pictures) await Promise.all(dataToUpdate.pictures.map(async (picture) => {
-      picture.link = await this.blobStorageClient.uploadBase64(picture.link)
+      picture.link = await this.uploadBase64(picture.link)
       return picture
     }))
 
     if (dataToUpdate.banner)
-      dataToUpdate.banner = await this.blobStorageClient.uploadBase64(dataToUpdate.banner)
+      dataToUpdate.banner = await this.uploadBase64(dataToUpdate.banner)
 
     return this.repository.save(currentEvent)
   }
