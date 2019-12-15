@@ -55,7 +55,7 @@ export class EventService {
     if (!foundersAndOrganizers.includes(owner)) throw new InvalidOwnerError(owner)
     if (creationData.organizers) await Promise.all(creationData.organizers.map(id => this.findUser(id as string, UserTypes.ORGANIZER)))
 
-    creationData.banner = await this.uploadBase64(creationData.banner)
+    if (creationData.banner) creationData.banner = await this.uploadBase64(creationData.banner)
     const event = Event.create(new ObjectId(), { ...creationData, owner })
 
     return this.repository.save(event)
