@@ -32,7 +32,7 @@ spec:
             - name: MICROSERVICES_USER_URL
               value: {{ default (tpl "http://ms-users.{{.Release.Namespace}}.svc.cluster.local" .) .Values.environment.MICROSERVICES_USER_URL | quote }}
             - name: MICROSERVICES_GROUP_URL
-              value: {{ default (tpl "http://ms-users.{{.Release.Namespace}}.svc.cluster.local" .) .Values.environment.MICROSERVICES_GROUP_URL | quote }}
+              value: {{ default (tpl "http://ms-groups.{{.Release.Namespace}}.svc.cluster.local" .) .Values.environment.MICROSERVICES_GROUP_URL | quote }}
             - name: AZURE_STORAGE_ACCOUNT_NAME
               value: {{ required "Storage acocunt name is required" .Values.environment.AZURE_STORAGE_ACCOUNT_NAME | quote}}
             - name: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
