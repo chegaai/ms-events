@@ -29,7 +29,7 @@
     "axios": "^0.19.0",
     "azure-blob-storage-client": "1.0.0",
     "bson": "^4.0.2",
-    "express-rescue": "^1.1.23",
+    "express-rescue": "1.1.20",
     "reflect-metadata": "^0.1.13",
     "string-to-objectid": "^1.0.5",
     "sugar-env": "^1.5.9",
