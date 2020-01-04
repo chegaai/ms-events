@@ -14,7 +14,7 @@
     "build:clean": "npm run clean && npm run build",
     "build:watch": "tsc -w",
     "start": "node dist/index.js",
-    "start:debug": "tsc && concurrently -s all \"tsc -w\" \"DEBUG=expresso:* nodemon dist/index.js\""
+    "start:debug": "tsc && concurrently -s all \"tsc -w\" \"DEBUG=expresso:*,ms-events:data:repositories:queries nodemon dist/index.js\""
   },
   "contributors": [
     "Lucas Santos <hello@lsantos.dev>"
@@ -29,6 +29,7 @@
     "axios": "^0.19.0",
     "azure-blob-storage-client": "1.0.0",
     "bson": "^4.0.2",
+    "debug": "^4.1.1",
     "express-rescue": "1.1.20",
     "reflect-metadata": "^0.1.13",
     "string-to-objectid": "^1.0.5",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/bson": "^4.0.1",
+    "@types/debug": "^4.1.5",
     "@types/express": "^4.17.2",
     "@types/node": "^12.12.22",
     "concurrently": "^5.0.2",

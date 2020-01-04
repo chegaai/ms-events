@@ -109,7 +109,7 @@ export default function factory (service: EventService) {
           }
         }
       },
-      required: ['name', 'description', 'seats', 'type', 'startAt', 'endAt', 'needsDocument', 'place', 'groups', 'rsvp'],
+      required: ['name', 'organizers', 'description', 'seats', 'type', 'startAt', 'endAt', 'needsDocument', 'place', 'groups', 'rsvp'],
       additionalProperties: false
     }),
     rescue(async (req: IExpressoRequest<CreateEventData>, res: Response) => {

@@ -8,7 +8,6 @@ import { UserClient } from '../data/clients/UserClient'
 import { GroupClient } from '../data/clients/GroupClient'
 import { PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
-import { EventRepository } from '../data/repositories/EventRepository'
 import { CreateEventData } from '../domain/event/structures/CreateEventData'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
@@ -16,6 +15,7 @@ import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
 import { OwnerNotFoundError } from '../domain/event/errors/OwnerNotFoundError'
 import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
 import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
+import { EventRepository, EventQueryParams } from '../data/repositories/EventRepository'
 import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
 import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
 
@@ -151,8 +151,8 @@ export class EventService {
     return event
   }
 
-  async listAll (page: number = 0, size: number = 10, publicOnly?: boolean): Promise<PaginatedQueryResult<Event>> {
-    return this.repository.getAll(page, size, publicOnly)
+  async listAll (page: number = 0, size: number = 10, query?: EventQueryParams): Promise<PaginatedQueryResult<Event>> {
+    return this.repository.getAll(page, size, query)
   }
 
   async updateAgenda (id: string, entries: AgendaSlot[]): Promise<Event> {

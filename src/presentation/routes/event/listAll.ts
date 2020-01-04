@@ -11,12 +11,13 @@ export default function factory (service: EventService) {
       properties: {
         page: { type: 'number', default: 0 },
         size: { type: 'number', default: 10 },
-        unpublished: { type: 'boolean' }
+        unpublished: { type: 'string', enum: ['true', 'false'], default: 'false' },
+        group: { type: 'string', pattern: '^[0-9a-f]{24}$' }
       }
     }),
-    rescue(async (req: IExpressoRequest<unknown, any, { page: number, size: number, unpublished?: boolean }>, res: Response) => {
-      const { page, size, unpublished = false } = req.query
-      const searchResult = await service.listAll(page, size, !unpublished)
+    rescue(async (req: IExpressoRequest<unknown, any, { page?: number, size?: number, unpublished?: string, groupId?: string }>, res: Response) => {
+      const { page, size, ...queryParams } = req.query
+      const searchResult = await service.listAll(page, size, queryParams)
       const { count, range, results, total } = searchResult
       const status = total > count ? 206 : 200
 
