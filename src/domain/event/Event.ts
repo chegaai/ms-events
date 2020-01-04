@@ -56,7 +56,7 @@ export class Event extends BaseEntity {
     event.owner = stringToObjectId(data.owner)
     event.organizers = data.organizers.map(stringToObjectId)
     event.needsDocument = data.needsDocument
-    event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
+    if (data.inquiries) event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
       ...inquiry,
       options: inquiry.type !== InquiryType.Selection ? [] : inquiry.options,
     }))
