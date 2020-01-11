@@ -215,4 +215,8 @@ export class EventService {
   deleteRSVPbyEmail(email: string) {
     this.repository.deleteRSVPsByEmail(email)
   }
+
+  deleteRSVPbyId(id: string) {
+    this.repository.deleteRSVPsById(id)
+  }
 }
