@@ -39,8 +39,8 @@ export default function factory (service: EventService) {
     rescue(async (req: IExpressoRequest<Partial<Attendee>, { eventId: string }>, res: Response, next: NextFunction) => {
       const rsvpData = req.body
       const eventId = req.params.eventId
-      rsvpData.userId = (req.onBehalfOf) ? req.onBehalfOf as string : null
-      
+      rsvpData.userId = (req.onBehalfOf) ? req.onBehalfOf.toString() : null
+
       if (!req.onBehalfOf && (!rsvpData.email || !rsvpData.name || !rsvpData.document)){
         next(boom.badData('email or name or document is missing', { code: 'unprocessable_entity' }))
       }

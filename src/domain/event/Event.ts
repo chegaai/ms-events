@@ -64,6 +64,10 @@ export class Event extends BaseEntity {
     event.tags = data.tags
     event.groups = data.groups.map(stringToObjectId)
     event.agenda = data.agenda
+    event.rsvp = {
+      openAt: new Date(data.rsvp.openAt),
+      closeAt: new Date(data.rsvp.closeAt)
+    }
 
     if (data.attendees) event.attendees = data.attendees
     if (data.waitingList) event.waitingList = data.waitingList.sort((prev, next) => prev.timestamp.getTime() - next.timestamp.getTime())
@@ -128,7 +132,6 @@ export class Event extends BaseEntity {
 
   addAttendee (attendee: Attendee) {
     if (!this.isRSVPOpen()) throw new RSVPOutOfDateError(this.rsvp)
-
     // Attendee is on waiting list and declines event (only possible flux)
     if (this.attendeeIsOnWaitingList(attendee) && attendee.rsvp === RSVPStates.NotGoing) {
       this.waitingList = this.removeFromList(this.waitingList, attendee)
@@ -231,6 +234,7 @@ export class Event extends BaseEntity {
       organizers: this.organizers,
       needsDocument: this.needsDocument,
       inquiries: this.inquiries,
+      attendees: this.attendees,
       place: {
         name: this.place.name,
         address: this.place.address,
@@ -246,7 +250,6 @@ export class Event extends BaseEntity {
         openAt: this.rsvp.openAt,
         closeAt: this.rsvp.closeAt
       },
-      attendees: this.attendees,
       waitingList: this.waitingList,
       tags: this.tags,
       pictures: this.pictures,
