@@ -1,11 +1,11 @@
 import { ObjectId } from 'bson'
 import stringToObjectId from 'string-to-objectid'
 import { BaseEntity, BaseEntityData } from '../BaseEntity'
-import { UpdateEventData } from './structures/UpdateEventData'
-import { CreateEventData } from './structures/CreateEventData'
 import { RSVPOutOfDateError } from './errors/RSVPOutOfDateError'
-import { Inquiry, Place, EventType, RSVP, Attendee, AgendaSlot, Picture, InquiryType, RSVPStates } from './structures/Types'
 import { UserNotAllowedError } from './errors/UserNotAllowedError'
+import { CreateEventData } from './structures/CreateEventData'
+import { AgendaSlot, Attendee, EventType, Inquiry, InquiryType, Picture, Place, RSVP, RSVPStates } from './structures/Types'
+import { UpdateEventData } from './structures/UpdateEventData'
 
 export class Event extends BaseEntity {
   id: ObjectId = new ObjectId()
@@ -28,7 +28,8 @@ export class Event extends BaseEntity {
     country: '',
     city: '',
     state: '',
-    placeId: ''
+    placeId: '',
+    name: ''
   }
   rsvp: RSVP = {
     openAt: new Date(),
@@ -49,14 +50,13 @@ export class Event extends BaseEntity {
     event.description = data.description
     event.banner = data.banner
     event.seats = data.seats
-    event.place.placeId = data.place.placeId
     event.type = data.type
     event.startAt = data.startAt
     event.endAt = data.endAt
     event.owner = stringToObjectId(data.owner)
     event.organizers = data.organizers.map(stringToObjectId)
     event.needsDocument = data.needsDocument
-    event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
+    if (data.inquiries) event.inquiries = data.inquiries.map((inquiry: Inquiry) => ({
       ...inquiry,
       options: inquiry.type !== InquiryType.Selection ? [] : inquiry.options,
     }))
@@ -219,7 +219,7 @@ export class Event extends BaseEntity {
 
   toObject () {
     return {
-      _id: this.id,
+      id: this.id,
       name: this.name,
       description: this.description,
       banner: this.banner,
@@ -232,6 +232,7 @@ export class Event extends BaseEntity {
       needsDocument: this.needsDocument,
       inquiries: this.inquiries,
       place: {
+        name: this.place.name,
         address: this.place.address,
         zipCode: this.place.zipCode,
         number: this.place.number,

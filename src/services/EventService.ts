@@ -8,7 +8,6 @@ import { UserClient } from '../data/clients/UserClient'
 import { GroupClient } from '../data/clients/GroupClient'
 import { PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
 import { BlobStorageClient } from '../data/clients/BlobStorageClient'
-import { EventRepository } from '../data/repositories/EventRepository'
 import { CreateEventData } from '../domain/event/structures/CreateEventData'
 import { UpdateEventData } from '../domain/event/structures/UpdateEventData'
 import { InvalidOwnerError } from '../domain/event/errors/InvalidOwnerError'
@@ -17,6 +16,7 @@ import { OwnerNotFoundError } from '../domain/event/errors/OwnerNotFoundError'
 import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
 import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { Attendee, AgendaSlot, RSVPStates, AttendeeResponse } from '../domain/event/structures/Types'
+import { EventRepository, EventQueryParams } from '../data/repositories/EventRepository'
 import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
 
 export enum UserTypes {
@@ -38,9 +38,9 @@ export class EventService {
     private readonly groupClient: GroupClient
   ) { }
 
-  private async uploadBase64(base64: string){
-    const url = await this.blobStorageClient.upload(base64)
-    if(!url)
+  private async uploadBase64 (base64: string) {
+    const url = await this.blobStorageClient.uploadBase64(base64, 'image/*')
+    if (!url)
       throw Error() //TODO: throw better error handler
     return url
   }
@@ -158,8 +158,8 @@ export class EventService {
     return event
   }
 
-  async listAll (page: number = 0, size: number = 10, publicOnly?: boolean): Promise<PaginatedQueryResult<Event>> {
-    return this.repository.getAll(page, size, publicOnly)
+  async listAll (page: number = 0, size: number = 10, query?: EventQueryParams): Promise<PaginatedQueryResult<Event>> {
+    return this.repository.getAll(page, size, query)
   }
 
   async updateAgenda (id: string, entries: AgendaSlot[]): Promise<Event> {
@@ -200,7 +200,7 @@ export class EventService {
           attendee.timestamp
         ]
 
-        const line = [ ...data, ...responses ].join(',')
+        const line = [...data, ...responses].join(',')
 
         callback(null, line)
       }

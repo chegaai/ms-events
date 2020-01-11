@@ -1,11 +1,37 @@
+import debug from 'debug'
 import { PassThrough } from 'stream'
 import { Db, ObjectId } from 'mongodb'
 import { inject, injectable } from 'tsyringe'
+import { Nullable } from '../../utils/Nullable'
 import { Event } from '../../domain/event/Event'
 import { Attendee, RSVPStates } from '../../domain/event/structures/Types'
+import { QueryFieldMap, getQueryGenerator } from '../../utils/query-generator'
 import { SerializedEvent } from '../../domain/event/structures/SerializedEvent'
 import { MongodbRepository, PaginatedQueryResult } from '@nindoo/mongodb-data-layer'
-import { Nullable } from '../../utils/Nullable'
+
+
+const logQuery = debug('ms-events:data:repositories:queries')
+
+export type EventQueryParams = {
+  groupId?: string,
+  unpublished?: string
+}
+
+const queryFieldMap: QueryFieldMap<EventQueryParams> = {
+  groupId: {
+    fieldName: 'groups',
+    convert: (value) => ObjectId.isValid(value) ? new ObjectId(value) : null
+  },
+  unpublished: {
+    fieldName: 'publicSince',
+    convert: (value: 'true' | 'false') => {
+      if (value === 'true') return null
+      return { $lte: new Date() }
+    }
+  }
+}
+
+const generateQuery = getQueryGenerator<EventQueryParams>(queryFieldMap)
 
 @injectable()
 export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
@@ -15,7 +41,8 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
   }
 
   serialize (entity: Event): SerializedEvent {
-    return entity.toObject()
+    const { id, ...result } = entity.toObject()
+    return { _id: id, ...result }
   }
 
   deserialize (data: SerializedEvent): Event {
@@ -31,19 +58,13 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     return Event.create(_id, creationData)
   }
 
-  async getAll (page: number, size: number, publicOnly = true): Promise<PaginatedQueryResult<Event>> {
-    const query: Record<string, any> = {
-      deletedAt: null
-    }
+  async getAll (page: number, size: number, queryParams: EventQueryParams = {}): Promise<PaginatedQueryResult<Event>> {
+    const query = generateQuery(
+      queryParams,
+      { deletedAt: null }
+    )
 
-    if (publicOnly) {
-      const now = new Date()
-      now.setHours(0)
-      now.setMinutes(0)
-      now.setMilliseconds(0)
-
-      query.publicSince = { $lte: now }
-    }
+    logQuery('Running paginated query: %o', query)
 
     return this.runPaginatedQuery(query, page, size)
   }
