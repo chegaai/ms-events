@@ -132,7 +132,6 @@ export class Event extends BaseEntity {
 
   addAttendee (attendee: Attendee) {
     if (!this.isRSVPOpen()) throw new RSVPOutOfDateError(this.rsvp)
-
     // Attendee is on waiting list and declines event (only possible flux)
     if (this.attendeeIsOnWaitingList(attendee) && attendee.rsvp === RSVPStates.NotGoing) {
       this.waitingList = this.removeFromList(this.waitingList, attendee)

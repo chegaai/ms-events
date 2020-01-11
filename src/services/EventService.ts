@@ -135,10 +135,9 @@ export class EventService {
     const user = (rsvpData.userId) 
       ? await this.userClient.findUserById(rsvpData.userId) 
       : { ...rsvpData }
-    
 
     event.addAttendee({
-      userId: user.userId,
+      userId: (rsvpData.userId) ? rsvpData.userId : null,
       name: user.name,
       email: user.email,
       document: user.document,
