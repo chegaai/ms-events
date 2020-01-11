@@ -41,7 +41,8 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
   }
 
   serialize (entity: Event): SerializedEvent {
-    return entity.toObject()
+    const { id, ...result } = entity.toObject()
+    return { _id: id, ...result }
   }
 
   deserialize (data: SerializedEvent): Event {

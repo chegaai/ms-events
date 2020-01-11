@@ -219,7 +219,7 @@ export class Event extends BaseEntity {
 
   toObject () {
     return {
-      _id: this.id,
+      id: this.id,
       name: this.name,
       description: this.description,
       banner: this.banner,
