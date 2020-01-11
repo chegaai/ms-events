@@ -15,8 +15,8 @@ import { UserNotFoundError } from '../domain/event/errors/UserNotFoundError'
 import { OwnerNotFoundError } from '../domain/event/errors/OwnerNotFoundError'
 import { EventNotFoundError } from '../domain/event/errors/EventNotFoundError'
 import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
+import { Attendee, AgendaSlot, RSVPStates, AttendeeResponse } from '../domain/event/structures/Types'
 import { EventRepository, EventQueryParams } from '../data/repositories/EventRepository'
-import { Attendee, AgendaSlot, RSVPStates } from '../domain/event/structures/Types'
 import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
 
 export enum UserTypes {
@@ -129,17 +129,24 @@ export class EventService {
     return this.repository.listPast(group.id, ownerId, page, size)
   }
 
-  async addRSVP (eventId: string, userId: string, rsvpData: Pick<Attendee, 'inquiryResponses' | 'rsvp'>) {
+  async addRSVP (eventId: string, rsvpData: Partial<Attendee>) {
     const event = await this.find(eventId)
-    const user = await this.userClient.findUserById(userId)
+    
+    const user = (rsvpData.userId) 
+      ? await this.userClient.findUserById(rsvpData.userId) 
+      : { ...rsvpData }
+    
 
     event.addAttendee({
+      userId: user.userId,
       name: user.name,
       email: user.email,
       document: user.document,
       timestamp: new Date(),
-      ...rsvpData
+      inquiryResponses: rsvpData.inquiryResponses as AttendeeResponse[],
+      rsvp: rsvpData.rsvp as RSVPStates
     })
+
     await this.repository.save(event)
     return event
   }
@@ -203,5 +210,13 @@ export class EventService {
     rsvpsStream.pipe(transformStream)
 
     return transformStream
+  }
+
+  deleteRSVPbyEmail(email: string) {
+    this.repository.deleteRSVPsByEmail(email)
+  }
+
+  deleteRSVPbyId(id: string) {
+    this.repository.deleteRSVPsById(id)
   }
 }
