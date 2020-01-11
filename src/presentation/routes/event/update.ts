@@ -1,11 +1,11 @@
-import rescue from 'express-rescue'
+import { IExpressoRequest } from '@expresso/app'
 import { boom } from '@expresso/errors'
 import { validate } from '@expresso/validator'
-import { Response, NextFunction } from 'express'
-import { EventService } from '../../../services/EventService'
+import { NextFunction, Response } from 'express'
+import rescue from 'express-rescue'
 import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
-import { IExpressoRequest } from '@expresso/app'
 import { UpdateEventData } from '../../../domain/event/structures/UpdateEventData'
+import { EventService } from '../../../services/EventService'
 
 export default function factory (service: EventService) {
   return [
@@ -66,6 +66,7 @@ export default function factory (service: EventService) {
           type: 'object',
           properties: {
             address: { type: 'string' },
+            name: { type: 'string' },
             zipCode: { type: 'string' },
             number: { type: 'string' },
             complement: { type: 'string' },

@@ -1,14 +1,14 @@
-import rescue from 'express-rescue'
+import { IExpressoRequest } from '@expresso/app'
 import { boom } from '@expresso/errors'
 import { validate } from '@expresso/validator'
-import { Response, NextFunction } from 'express'
-import { EventService } from '../../../services/EventService'
+import { NextFunction, Response } from 'express'
+import rescue from 'express-rescue'
+import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
+import { InvalidOwnerError } from '../../../domain/event/errors/InvalidOwnerError'
 import { OrganizerNotFoundError } from '../../../domain/event/errors/OrganizerNotFoundError'
 import { OwnerNotFoundError } from '../../../domain/event/errors/OwnerNotFoundError'
-import { InvalidOwnerError } from '../../../domain/event/errors/InvalidOwnerError'
-import { GroupNotFoundError } from '../../../domain/event/errors/GroupNotFoundError'
-import { IExpressoRequest } from '@expresso/app'
 import { CreateEventData } from '../../../domain/event/structures/CreateEventData'
+import { EventService } from '../../../services/EventService'
 
 export default function factory (service: EventService) {
   return [
@@ -72,6 +72,7 @@ export default function factory (service: EventService) {
             number: { type: 'string' },
             complement: { type: 'string' },
             placeId: { type: 'string' },
+            name: { type: 'string' },
             country: { type: 'string' },
             city: { type: 'string' },
             state: { type: 'string' },
