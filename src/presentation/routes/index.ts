@@ -8,9 +8,10 @@ import listPast from './event/listPast'
 import getRsvps from './event/getRsvps'
 import listUpcoming from './event/listUpcoming'
 import updateAgenda from './event/updateAgenda'
-import moveToConfirmed from './rsvp/moveToConfirmed'
 import moveToDeclined from './rsvp/moveToDeclined'
+import moveToConfirmed from './rsvp/moveToConfirmed'
 import moveToWaitingList from './rsvp/moveToWaitingList'
+import removeAllRSVPsByEmail from './event/removeAllRSVPsByEmail'
 
 export const routes = {
   create,
@@ -23,7 +24,8 @@ export const routes = {
   getRsvps,
   listUpcoming,
   updateAgenda,
-  moveToConfirmed,
   moveToDeclined,
-  moveToWaitingList
+  moveToConfirmed,
+  moveToWaitingList,
+  removeAllRSVPsByEmail
 }

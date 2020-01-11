@@ -28,16 +28,24 @@ export default function factory (service: EventService) {
         rsvp: {
           type: 'string',
           enum: Object.values(RSVPResponses)
-        }
+        },
+        email: { type: 'string' },
+        document: { type: 'string'},
+        name: { type: 'string'}
       },
       additionalProperties: false,
       required: ['inquiryResponses', 'rsvp']
     }),
-    rescue(async (req: IExpressoRequest<Pick<Attendee, 'inquiryResponses' | 'rsvp'>, { eventId: string }>, res: Response) => {
+    rescue(async (req: IExpressoRequest<Partial<Attendee>, { eventId: string }>, res: Response, next: NextFunction) => {
       const rsvpData = req.body
       const eventId = req.params.eventId
-      const userId = req.onBehalfOf
-      const event = await service.addRSVP(eventId, userId as string, rsvpData)
+      rsvpData.userId = (req.onBehalfOf) ? req.onBehalfOf as string : null
+      
+      if (!req.onBehalfOf && (!rsvpData.email || !rsvpData.name || !rsvpData.document)){
+        next(boom.badData('email or name or document is missing', { code: 'unprocessable_entity' }))
+      }
+    
+      const event = await service.addRSVP(eventId, rsvpData)
 
       res.status(200)
         .json(event.toObject())

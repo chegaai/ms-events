@@ -1,3 +1,4 @@
+import { Nullable } from "../../../utils/Nullable";
 
 export enum InquiryType {
   Number = 'number',
@@ -35,6 +36,7 @@ export interface AttendeeResponse {
 }
 
 export interface Attendee {
+  userId: Nullable<string>
   name: string
   email: string
   inquiryResponses: AttendeeResponse[]
