@@ -1,4 +1,4 @@
-import './tracing.ts'
+import './tracing'
 import 'reflect-metadata'
 import { start } from './presentation/server'
 
