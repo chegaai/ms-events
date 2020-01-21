@@ -45,10 +45,10 @@ export default function factory (service: EventService) {
         next(boom.badData('email or name or document is missing', { code: 'unprocessable_entity' }))
       }
     
-      const event = await service.addRSVP(eventId, rsvpData)
+      const attendee = await service.addRSVP(eventId, rsvpData)
 
       res.status(200)
-        .json(event.toObject())
+        .json(attendee)
     }),
     (err: any, _req: IExpressoRequest, _res: Response, next: NextFunction) => {
       if (err instanceof GroupNotFoundError) return next(boom.notFound(err.message, { code: 'group_not_found' }))

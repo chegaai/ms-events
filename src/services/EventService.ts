@@ -136,7 +136,7 @@ export class EventService {
       ? await this.userClient.findUserById(rsvpData.userId) 
       : { ...rsvpData }
 
-    event.addAttendee({
+    const attendee = {
       userId: (rsvpData.userId) ? rsvpData.userId : null,
       name: user.name,
       email: user.email,
@@ -144,10 +144,12 @@ export class EventService {
       timestamp: new Date(),
       inquiryResponses: rsvpData.inquiryResponses as AttendeeResponse[],
       rsvp: rsvpData.rsvp as RSVPStates
-    })
+    }
+
+    event.addAttendee(attendee)
 
     await this.repository.save(event)
-    return event
+    return attendee
   }
 
   async find (id: string): Promise<Event> {
