@@ -3,7 +3,6 @@ import { container } from 'tsyringe'
 import expresso from '@expresso/app'
 import errors from '@expresso/errors'
 import { Services } from '../services'
-import tracing from '@expresso/tracing'
 import { IAppConfig } from '../app.config'
 import { createConnection } from '@nindoo/mongodb-data-layer'
 
@@ -15,8 +14,6 @@ export const app = expresso(async (app, config: IAppConfig, environment: string)
   container.register('BlobStorageConfig', { useValue: config.azure.storage })
 
   const services = container.resolve(Services)
-
-  app.use(tracing.factory())
 
   app.get('/', routes.listAll(services.event))
   app.post('/', routes.create(services.event))
