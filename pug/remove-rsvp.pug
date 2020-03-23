@@ -1,0 +1,56 @@
+- const background = 'https://alpha.chega.ai/img/chegaai-marca_positiva-circulo.5afb7014.png'
+- const info = 'Que pena, esperamos que voce participe dos eventos futuros no Chega.ai'
+- const title = 'Não vai poder ir para o evento?'
+
+doctype html
+html
+  head
+  body(style=" \
+    background: #ccc;\
+    padding: 20px;\
+    color: $blue-gray-700;")
+    
+    div(style=" \
+      border-radius: 10px; \
+      background: #fff; \
+      width: 400px; \
+      margin-left: auto; \
+      padding-bottom: 10px; \
+      margin-right: auto; \
+      box-shadow: $box-shadow;")
+      
+      div(style=" \
+        display: flex; \
+        position: center; \
+        justify-content: center;")
+        img(src= background, width='30%', style="\
+          border-radius: 10px 10px 0px 0px;\
+		          padding-top: 30px;\
+          margin: auto;\
+          display: center;")
+      div(style=" \
+          padding-top: 20px;\
+          text-align: center;\
+          padding: 10px 20px;")
+         h3(style="\
+         color: $blue-gray-800;\
+          font-size: 28px;\
+          margin-bottom: 10px;") #{title}
+         p(style="\
+          line-height: 1.5;\
+          font-size: 16px;") #{info}
+          
+      div(style="\
+        margin: auto;\
+        display: center;\
+        padding: 20px;\
+        width: 50%;\
+        border-radius: 10px 10px 10px 10px;\
+        background: #66BB6A;\
+        color: #fff;\
+        text-align: center;\
+        font-size: 18px;\
+        cursor: pointer;") 
+        a(href=link style="\
+          color: inherit;\
+          text-decoration: inherit;") Cancelar inscrição
