@@ -1,5 +1,6 @@
 // import axios from 'axios'
 import { ObjectId } from 'bson'
+import { JWT } from '../utils/JWT'
 import { injectable } from 'tsyringe'
 import { Readable, Transform } from 'stream'
 import { Nullable } from '../utils/Nullable'
@@ -18,6 +19,9 @@ import { GroupNotFoundError } from '../domain/event/errors/GroupNotFoundError'
 import { Attendee, AgendaSlot, RSVPStates, AttendeeResponse } from '../domain/event/structures/Types'
 import { EventRepository, EventQueryParams } from '../data/repositories/EventRepository'
 import { OrganizerNotFoundError } from '../domain/event/errors/OrganizerNotFoundError'
+// import { InvalidTokenError } from './errors/InvalidTokenError'
+import { RemoveNotLoggedRSVPTemplate } from '../data/clients/mail-templates/RemoveNotLoggedRSVPTemplate'
+import { MailClient } from '../data/clients/MailClient'
 
 export enum UserTypes {
   USER,
@@ -29,13 +33,24 @@ function validateRsvpState (state: any): state is RSVPStates {
   return Object.values(RSVPStates).includes(state)
 }
 
+// function validateTokenPayload (payload: { sub?: string, action?: string } | string, expectedAction: string) {
+//   if (typeof payload === 'string') throw new InvalidTokenError(payload)
+//   const { sub, action } = payload as { sub?: string, action?: string }
+//   if (!sub || !action) throw new InvalidTokenError('token is missing properties')
+//   if (action !== expectedAction) throw new InvalidTokenError(`token action (${action}) is invalid`)
+//   if (!ObjectId.isValid(sub)) throw new InvalidTokenError(`token subject (${sub}) is invalid`)
+//   return { sub, action }
+// }
+
 @injectable()
 export class EventService {
   constructor (
     private readonly repository: EventRepository,
     private readonly userClient: UserClient,
     private readonly blobStorageClient: BlobStorageClient,
-    private readonly groupClient: GroupClient
+    private readonly groupClient: GroupClient,
+    private readonly mailClient: MailClient,
+    private readonly jwt: JWT
   ) { }
 
   private async uploadBase64 (base64: string) {
@@ -220,4 +235,27 @@ export class EventService {
   deleteRSVPbyId(id: string) {
     this.repository.deleteRSVPsById(id)
   }
+
+  async requestRemoveNotLoggedRSVP (eventId: string, email: string) {
+    const user = await this.repository.findAtendeeByEmail(eventId,  email)
+    if (!user) return
+
+    const payload = { action: 'remove-rsvp' }
+    const token = this.jwt.signPayload(payload, email, '1d')
+    const template = new RemoveNotLoggedRSVPTemplate(token, eventId, email)
+
+    await this.mailClient.send('Remoção de RSVP', email, template)
+  }
+
+  // async recoverPassword (token: string, newPassword: string) {
+  //   const payload = this.jwt.verify(token)
+  //   const { sub: email } = validateTokenPayload(payload, 'remove-rsvp')
+
+  //   const user = await this.find(userId)
+  //   const password = await this.crypto.encrypt(newPassword)
+  //   user.password = password
+
+  //   await this.repository.save(user)
+  // }
+
 }

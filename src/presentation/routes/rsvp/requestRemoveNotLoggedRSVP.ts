@@ -2,9 +2,9 @@
 import rescue from 'express-rescue'
 import { Request, Response } from 'express'
 import { validate } from '@expresso/validator'
-import { UserService } from '../../../services/UserService'
+import { EventService } from '../../../services/EventService'
 
-export function factory (service: UserService) {
+export function factory (service: EventService) {
   return [
     validate({
       type: 'object',
@@ -12,15 +12,16 @@ export function factory (service: UserService) {
         email: {
           type: 'string',
           format: 'email'
-        }
+        },
+        eventId: { type: 'string' }
       },
-      required: ['email'],
+      required: ['email', 'eventId'],
       additionalProperties: false
     }),
     rescue(async (req: Request, res: Response) => {
-      const email = req.body.email
+      const { email, eventId } = req.body.email
 
-      await service.requestRemoveNotLoggedRSVP(email)
+      await service.requestRemoveNotLoggedRSVP(eventId, email)
 
       res.status(202)
         .end()

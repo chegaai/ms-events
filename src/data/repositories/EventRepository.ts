@@ -133,4 +133,19 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
       ]}
     )
   }
+
+  async findAtendeeByEmail (eventId:string,  email: string){
+    const attendeesStream = this.collection.aggregate<Attendee>([
+      { $match: { _id: new ObjectId(eventId) } },
+      { $unwind: '$attendees' },
+      { $replaceRoot: { newRoot: '$attendees' } },
+      { $match: { email: email } }
+    ], { cursor: { batchSize: 1 } })
+
+    const resultStream = new PassThrough()
+
+    attendeesStream.pipe(resultStream)
+
+    return resultStream
+  }
 }

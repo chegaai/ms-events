@@ -24,6 +24,13 @@ export interface IAppConfig extends IExpressoConfigOptions {
       containerName: string,
       timeOut: number
     }
+  },
+  clients: {
+    mail: {
+      url: string,
+      timeout: number,
+      lang: string,
+    }
   }
 }
 
@@ -59,6 +66,13 @@ export const config: IAppConfig = {
       accountAccessKey: env.get('AZURE_STORAGE_ACCOUNT_ACCESS_KEY', ''),
       containerName: env.get('AZURE_STORAGE_CONTAINER_NAME', 'events'),
       timeOut: env.get('AZURE_STORAGE_TIMEOUT', 60000)
+    }
+  },
+  clients: {
+    mail: {
+      url: env.get('CLIENTS_MAIL_URL', 'http://zaqar:3000'),
+      timeout: env.get.int('CLIENTS_MAIL_TIMEOUT', 9000),
+      lang: env.get('ZAQAR_LANG', 'pug'),
     }
   }
 }
