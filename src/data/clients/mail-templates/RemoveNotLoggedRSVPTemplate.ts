@@ -6,12 +6,12 @@ export class RemoveNotLoggedRSVPTemplate extends Template {
     public readonly eventId: string,
     public readonly email: string
   ) {
-    super('remove-not-logged-rsvp')
+    super('remove-rsvp')
   }
 
   getData () {
     return {
-      link: `https://chega.ai/remove-not-logged-rsvp?token=${encodeURIComponent(this.token)}&eventId=${encodeURIComponent(this.eventId)}&email=${encodeURIComponent(this.email)}`
+      link: `https://chega.ai/remove-rsvp?token=${encodeURIComponent(this.token)}&eventId=${encodeURIComponent(this.eventId)}&email=${encodeURIComponent(this.email)}`
     }
   }
 }

@@ -26,14 +26,16 @@ export class MailClient {
    * @param template Template that should be used by the email microservice to populate the message's body
    */
   async send (subject: string, to: string, template: Template) {
+    const text = await template.getContent()
+    const data = template.getData()
     const payload = {
       subject,
       to: [to],
       template: { 
-        text: await template.getContent(),
+        text,
         lang: this.lang
       },
-      data: template.getData()
+      data
     }
 
     await this.http.post('/send', payload)
@@ -42,5 +44,6 @@ export class MailClient {
 
         throw new Error(err.response.data.error.message)
       })
+    
   }
 }

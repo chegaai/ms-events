@@ -119,6 +119,20 @@ export class EventRepository extends MongodbRepository<Event, SerializedEvent> {
     )
   }
 
+  async deleteRSVPInEventByEmail (eventId:string, email: string){
+    this.collection.update({}, 
+      {$set: {
+        'attendees.$[i].name': '',
+        'attendees.$[i].email': '',
+        'attendees.$[i].document': '',
+        'attendees.$[i].inquiryResponses': [],
+      }},
+      {arrayFilters: [
+        {'id': eventId, 'i.email': email}
+      ]}
+    )
+  }
+
   async deleteRSVPsById (id: string){
     this.collection.update({}, 
       {$set: {

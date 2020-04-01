@@ -9,19 +9,15 @@ export function factory (service: EventService) {
     validate({
       type: 'object',
       properties: {
-        email: {
-          type: 'string',
-          format: 'email'
-        },
-        eventId: { type: 'string' }
+        token: { type: 'string', pattern: '^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$' }
       },
-      required: ['email', 'eventId'],
+      required: ['token'],
       additionalProperties: false
     }),
     rescue(async (req: Request, res: Response) => {
-      const { email, eventId } = req.body.email
+      const { token } = req.body.email
 
-      await service.requestRemoveNotLoggedRSVP(eventId, email)
+      await service.removeNotLoggedRSVP(token)
 
       res.status(202)
         .end()

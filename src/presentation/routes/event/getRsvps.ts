@@ -6,7 +6,7 @@ import { RSVPStates } from '../../../domain/event/structures/Types'
 import { EventNotFoundError } from '../../../domain/event/errors/EventNotFoundError'
 import { boom } from '@expresso/errors'
 
-export function factory (service: EventService) {
+export default function factory (service: EventService) {
   return [
     validate.query({
       type: 'object',
@@ -38,4 +38,3 @@ export function factory (service: EventService) {
   ]
 }
 
-export default { factory }

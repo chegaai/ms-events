@@ -3,40 +3,19 @@ import { IServerConfig } from '@expresso/server'
 import { IExpressoConfigOptions } from '@expresso/app'
 import { IMongoParams } from '@nindoo/mongodb-data-layer'
 
-interface MicroserviceConfig {
-  url: string
-}
-
-export interface IAppConfig extends IExpressoConfigOptions {
+interface BaseConfig extends IExpressoConfigOptions {
   name: string,
   database: {
     mongodb: IMongoParams
   },
   server?: IServerConfig['server']
-  microServices: {
-    user: MicroserviceConfig
-    group: MicroserviceConfig
-  },
-  azure: {
-    storage: {
-      accountName: string,
-      accountAccessKey: string,
-      containerName: string,
-      timeOut: number
-    }
-  },
-  clients: {
-    mail: {
-      url: string,
-      timeout: number,
-      lang: string,
-    }
-  }
 }
+
+export type IAppConfig = BaseConfig & typeof config
 
 const APP_NAME = 'ms-event'
 
-export const config: IAppConfig = {
+export const config = {
   name: APP_NAME,
   server: {
     printOnListening: true,
@@ -74,5 +53,11 @@ export const config: IAppConfig = {
       timeout: env.get.int('CLIENTS_MAIL_TIMEOUT', 9000),
       lang: env.get('ZAQAR_LANG', 'pug'),
     }
-  }
+  },
+  jwt: {
+    secret: env.get('JWT_SECRET', ''),
+    audience: env.get('JWT_AUDIENCE', 'chega.ai:gateway'),
+    expiration: env.get('JWT_EXPIRATION', '1d'),
+    issuer: env.get('JWT_ISSUER', 'chega.ai:ms-events')
+  },
 }

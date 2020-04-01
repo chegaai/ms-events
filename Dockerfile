@@ -28,6 +28,9 @@ COPY --from=builder [\
   "/usr/app/" \
   ]
 
+COPY "./pug" "/usr/app/pug"
+
+
 COPY --from=builder "/usr/src/app/dist" "/usr/app/dist"
 
 RUN npm install --only=prod

@@ -12,12 +12,13 @@ import moveToDeclined from './rsvp/moveToDeclined'
 import moveToConfirmed from './rsvp/moveToConfirmed'
 import moveToWaitingList from './rsvp/moveToWaitingList'
 import removeAllRSVPsByEmail from './event/removeAllRSVPsByEmail'
+import requestToDeclineRSVP from './rsvp/requestToDeclineRSVP'
 
 export const routes = {
+  find,
   create,
   update,
   remove,
-  find,
   listAll,
   addRsvp,
   listPast,
@@ -27,5 +28,6 @@ export const routes = {
   moveToDeclined,
   moveToConfirmed,
   moveToWaitingList,
-  removeAllRSVPsByEmail
+  requestToDeclineRSVP,
+  removeAllRSVPsByEmail,
 }
