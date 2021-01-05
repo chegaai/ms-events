@@ -27,7 +27,7 @@
     "@expresso/tracing": "1.0.7",
     "@expresso/validator": "^1.1.1",
     "@nindoo/mongodb-data-layer": "^2.0.2",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "azure-blob-storage-client": "1.0.0",
     "bson": "^4.0.2",
     "debug": "^4.1.1",
